@@ -2,6 +2,10 @@
 
 namespace P.Pager
 {
+    /// <summary>
+    /// A page of items plus paging metadata, built from an <see cref="IQueryable{T}"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of object the collection should contain.</typeparam>
     public class Pager<T> : BasePager<T>
     {
         /// <summary>
