@@ -10,16 +10,19 @@ namespace P.Pager
         /// <summary>
         /// Index of child set within the parent list.
         /// </summary>
+        /// <remarks>Deprecated setter: changing paging metadata after construction makes it inconsistent with the items. It will be removed in v10.</remarks>
         int CurrentPageIndex { get; set; }
 
         /// <summary>
         /// Size of individual child set.
         /// </summary>
+        /// <remarks>Deprecated setter: changing paging metadata after construction makes it inconsistent with the items. It will be removed in v10.</remarks>
         int PageSize { get; set; }
 
         /// <summary>
         /// Total number of items in parent list.
         /// </summary>
+        /// <remarks>Deprecated setter: changing paging metadata after construction makes it inconsistent with the items. It will be removed in v10.</remarks>
         int TotalItemCount { get; set; }
 
         /// <summary>
@@ -64,6 +67,10 @@ namespace P.Pager
     /// <typeparam name="T">The type of object the collection should contain.</typeparam>
     public interface IPager<out T> : IEnumerable<T>, IPager
     {
+        /// <summary>
+        /// Gets the item at the specified zero-based index within the current page.
+        /// </summary>
+        /// <param name="index">The zero-based index of the item to get.</param>
         T this[int index] { get; }
     }
 }

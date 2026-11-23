@@ -1,0 +1,67 @@
+﻿@namespace P.Pager.Blazor
+
+@if (Source is { } src && (src.TotalPageCount > 1 || !HideWhenSinglePage))
+{
+    <nav aria-label="@AriaLabel" class="@CssContainer">
+        <ul class="@CssList">
+            @if (ShowFirstLast)
+            {
+                @Item(1, FirstText, "First page", !src.IsFirstPage, null)
+            }
+            @if (ShowPreviousNext)
+            {
+                @Item(src.CurrentPageIndex - 1, PreviousText, "Previous page", src.HasPreviousPage, "prev")
+            }
+            @if (ShowPageNumbers && Slice is null)
+            {
+                var (first, last) = Window();
+                if (first > 1)
+                {
+                    <li class="@Join(CssItem, CssDisabledItem)"><span class="@CssLink">&#8230;</span></li>
+                }
+                for (int i = first; i <= last; i++)
+                {
+                    int pageNumber = i;
+                    if (pageNumber == src.CurrentPageIndex)
+                    {
+                        <li class="@Join(CssItem, CssActiveItem)"><span class="@Join(CssLink, CssActiveLink)" aria-current="page">@pageNumber</span></li>
+                    }
+                    else
+                    {
+                        @Item(pageNumber, pageNumber.ToString(System.Globalization.CultureInfo.CurrentCulture), "Page " + pageNumber, true, null)
+                    }
+                }
+                if (last < src.TotalPageCount)
+                {
+                    <li class="@Join(CssItem, CssDisabledItem)"><span class="@CssLink">&#8230;</span></li>
+                }
+            }
+            @if (ShowPreviousNext)
+            {
+                @Item(src.CurrentPageIndex + 1, NextText, "Next page", src.HasNextPage, "next")
+            }
+            @if (ShowFirstLast && Slice is null)
+            {
+                @Item(src.TotalPageCount, LastText, "Last page", !src.IsLastPage, null)
+            }
+        </ul>
+    </nav>
+}
+
+@code {
+    private RenderFragment Item(int targetPage, string text, string label, bool enabled, string? rel) => __builder =>
+    {
+        if (!enabled)
+        {
+            <li class="@Join(CssItem, CssDisabledItem)"><span class="@Join(CssLink, CssDisabledLink)" aria-disabled="true" aria-label="@label">@text</span></li>
+        }
+        else if (PageUrl is not null)
+        {
+            <li class="@CssItem"><a class="@CssLink" href="@PageUrl(targetPage)" rel="@rel" aria-label="@label" @onclick="() => OnPageChanged.InvokeAsync(targetPage)">@text</a></li>
+        }
+        else
+        {
+            <li class="@CssItem"><button type="button" class="@CssLink" aria-label="@label" @onclick="() => OnPageChanged.InvokeAsync(targetPage)">@text</button></li>
+        }
+    };
+}

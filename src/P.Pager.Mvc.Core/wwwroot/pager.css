@@ -1,0 +1,108 @@
+/*
+ * P.Pager default theme (PagerTheme.Default). Framework-neutral, no dependencies.
+ * Include it with:
+ *   MVC / Razor Pages:  <link rel="stylesheet" href="~/_content/P.Pager.Mvc.Core/pager.css" />
+ *   Blazor:             <link rel="stylesheet" href="_content/P.Pager.Blazor/pager.css" />
+ * Customize by overriding the --pager-* variables on .pager (or any parent).
+ */
+.pager {
+    --pager-gap: 0.25rem;
+    --pager-size: 2.25rem;
+    --pager-padding-x: 0.75rem;
+    --pager-radius: 0.375rem;
+    --pager-font-size: 0.875rem;
+    --pager-color: #1f2328;
+    --pager-bg: #ffffff;
+    --pager-border: #d0d7de;
+    --pager-hover-bg: #f3f4f6;
+    --pager-active-color: #ffffff;
+    --pager-active-bg: #0969da;
+    --pager-active-border: #0969da;
+    --pager-disabled-color: #8c959f;
+    --pager-focus: #0969da;
+
+    display: flex;
+    justify-content: center;
+    margin: 1rem 0;
+}
+
+@media (prefers-color-scheme: dark) {
+    .pager {
+        --pager-color: #e6edf3;
+        --pager-bg: #0d1117;
+        --pager-border: #30363d;
+        --pager-hover-bg: #161b22;
+        --pager-active-bg: #1f6feb;
+        --pager-active-border: #1f6feb;
+        --pager-disabled-color: #6e7681;
+        --pager-focus: #58a6ff;
+    }
+}
+
+.pager-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--pager-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.pager-link {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--pager-size);
+    height: var(--pager-size);
+    padding: 0 var(--pager-padding-x);
+    border: 1px solid var(--pager-border);
+    border-radius: var(--pager-radius);
+    background: var(--pager-bg);
+    color: var(--pager-color);
+    font: inherit;
+    font-size: var(--pager-font-size);
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+
+a.pager-link:hover,
+button.pager-link:hover {
+    background: var(--pager-hover-bg);
+}
+
+.pager-link:focus-visible {
+    outline: 2px solid var(--pager-focus);
+    outline-offset: 2px;
+}
+
+.pager-item.is-active .pager-link {
+    background: var(--pager-active-bg);
+    border-color: var(--pager-active-border);
+    color: var(--pager-active-color);
+    cursor: default;
+}
+
+.pager-item.is-disabled .pager-link {
+    color: var(--pager-disabled-color);
+    background: transparent;
+    cursor: default;
+    pointer-events: none;
+}
+
+/* Text items (pager text, entries text, ellipses) are <span>s: no box. */
+span.pager-link:not([aria-disabled]):not([aria-current]) {
+    border-color: transparent;
+    background: transparent;
+    cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pager-link {
+        transition: none;
+    }
+}

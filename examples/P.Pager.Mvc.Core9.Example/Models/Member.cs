@@ -12,13 +12,13 @@ public class Member
     {
         set;
         get;
-    }
+    } = string.Empty;
 
     public string Company
     {
         set;
         get;
-    }
+    } = string.Empty;
 }
 
 
@@ -26,7 +26,8 @@ public class DemoData
 {
     public List<Member> GetMembers()
     {
-        var list = new List<Member> {
+        List<Member> list =
+        [
                 new Member {
                     Id = 1,
                     Name = "Manson",
@@ -557,7 +558,7 @@ public class DemoData
                     Name = "Manson",
                     Company = "Manson"
                 }
-            };
+            ];
         return list;
     }
 }

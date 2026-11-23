@@ -1,0 +1,56 @@
+<Project>
+  <!-- Shared settings for every package under src/. Project files only hold what is specific to them. -->
+
+  <PropertyGroup Label="Version">
+    <!-- Bump here to version all packages together. 9.0.0 is published on nuget.org, so this release is a
+         backward-compatible minor version: public API and default output must stay compatible with 9.0.0. -->
+    <Version>9.1.0</Version>
+    <!-- AssemblyVersion stays 9.0.0.0 within 9.x so strong-named apps and binding redirects keep working. -->
+    <AssemblyVersion>9.0.0.0</AssemblyVersion>
+    <FileVersion>9.1.0.0</FileVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Package metadata">
+    <Company>BlogArray</Company>
+    <Authors>Sisindry Medagam</Authors>
+    <Copyright>Copyright © 2019-2026 Sisindry Medagam, BlogArray</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/BlogArray/P.Pager</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/BlogArray/P.Pager.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <NeutralLanguage>en-IN</NeutralLanguage>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Build">
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Deterministic>true</Deterministic>
+    <SignAssembly>true</SignAssembly>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Symbols, SourceLink, validation">
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <!-- Fail the build on any API break versus the published package (P.Pager.Blazor is new, so it has no baseline). -->
+    <PackageValidationBaselineVersion Condition="'$(MSBuildProjectName)' != 'P.Pager.Blazor'">9.0.0</PackageValidationBaselineVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Trimming and Native AOT" Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
+    <!-- Turns on the trim/AOT analyzers so incompatible code fails the build, and marks the assembly as trimmable. -->
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)..\icon.png" Pack="true" PackagePath="\" Visible="false" />
+    <None Include="$(MSBuildThisFileDirectory)..\README.md" Pack="true" PackagePath="\" Visible="false" />
+  </ItemGroup>
+</Project>

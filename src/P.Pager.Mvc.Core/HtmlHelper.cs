@@ -9,6 +9,9 @@ using System.Text.Encodings.Web;
 
 namespace P.Pager.Mvc.Core
 {
+    /// <summary>
+    /// HTML helper extensions that render a pagination control for an <see cref="IPager"/>.
+    /// </summary>
     public static class HtmlHelper
     {
         /// <summary>
@@ -18,9 +21,9 @@ namespace P.Pager.Mvc.Core
         /// <param name="pager">The Pager to use as the data source.</param>
         /// <param name="generatePageUrl">A function that takes the page number of the desired page and returns a URL-string that will load that page.</param>
         /// <returns>Outputs the pagination control HTML.</returns>
-        public static HtmlString Pager(this IHtmlHelper html, IPager pager, Func<int, string> generatePageUrl)
+        public static HtmlString Pager(this IHtmlHelper html, IPager pager, Func<int, string?> generatePageUrl)
         {
-            return Pager(html, pager, generatePageUrl, new PagerOptions());
+            return Render(pager, generatePageUrl, new PagerOptions());
         }
 
         /// <summary>
@@ -31,30 +34,103 @@ namespace P.Pager.Mvc.Core
         /// <param name="generatePageUrl">A function that takes the page number of the desired page and returns a URL-string that will load that page.</param>
         /// <param name="pagerOptions">Formatting options.</param>
         /// <returns>Outputs the pagination control HTML.</returns>
-        public static HtmlString Pager(this IHtmlHelper html, IPager pager, Func<int, string> generatePageUrl, PagerOptions pagerOptions)
+        public static HtmlString Pager(this IHtmlHelper html, IPager pager, Func<int, string?> generatePageUrl, PagerOptions pagerOptions)
         {
-            return PageBuilder(html, pager, generatePageUrl, pagerOptions);
+            return Render(pager, generatePageUrl, pagerOptions);
         }
 
-        private static HtmlString PageBuilder(IHtmlHelper html, IPager pager, Func<int, string> generatePageUrl, PagerOptions pagerOptions)
+        /// <summary>
+        /// Displays a paging control whose links are the current URL with only the page query-string parameter changed,
+        /// so filters, sorting and other query-string values are kept.
+        /// </summary>
+        /// <param name="html">This method is meant to hook off HtmlHelper as an extension method.</param>
+        /// <param name="pager">The Pager to use as the data source.</param>
+        /// <param name="pagerOptions">Formatting options. Default options when null.</param>
+        /// <param name="pageParameterName">Name of the page query-string parameter. By default page.</param>
+        /// <returns>Outputs the pagination control HTML.</returns>
+        public static HtmlString Pager(this IHtmlHelper html, IPager pager, PagerOptions? pagerOptions = null, string pageParameterName = "page")
         {
+            return html == null
+                ? throw new ArgumentNullException(nameof(html))
+                : Render(pager, PagerUrl.ForCurrentRequest(html.ViewContext.HttpContext.Request, pageParameterName), pagerOptions ?? new PagerOptions());
+        }
+
+        /// <summary>
+        /// Displays First / Previous / Next links for a count-free <see cref="ISlice"/>. Page numbers, Last, pager text and
+        /// entries text need the total, so they are not shown.
+        /// </summary>
+        /// <param name="html">This method is meant to hook off HtmlHelper as an extension method.</param>
+        /// <param name="slice">The slice to use as the data source.</param>
+        /// <param name="generatePageUrl">Builds the URL for a page number. When null, the current URL with only the page parameter changed.</param>
+        /// <param name="pagerOptions">Formatting options. Default options when null.</param>
+        /// <param name="pageParameterName">Name of the page query-string parameter used when <paramref name="generatePageUrl"/> is null. By default page.</param>
+        /// <returns>Outputs the pagination control HTML.</returns>
+        public static HtmlString SlicePager(this IHtmlHelper html, ISlice slice, Func<int, string?>? generatePageUrl = null, PagerOptions? pagerOptions = null, string pageParameterName = "page")
+        {
+            if (generatePageUrl == null)
+            {
+                if (html == null) throw new ArgumentNullException(nameof(html));
+                generatePageUrl = PagerUrl.ForCurrentRequest(html.ViewContext.HttpContext.Request, pageParameterName);
+            }
+            return RenderSlice(slice, generatePageUrl, pagerOptions ?? new PagerOptions());
+        }
+
+        internal static HtmlString RenderSlice(ISlice slice, Func<int, string?> generatePageUrl, PagerOptions pagerOptions)
+        {
+            return slice == null
+                ? throw new ArgumentNullException(nameof(slice))
+                : pagerOptions == null
+                ? throw new ArgumentNullException(nameof(pagerOptions))
+                : Render(new SliceAsPager(slice), generatePageUrl, pagerOptions.ForSlice());
+        }
+
+        /// <summary>
+        /// Presents a slice as a pager whose last known page is the next one (or the current one when there is no next page).
+        /// Only the members used for First/Previous/Next are meaningful.
+        /// </summary>
+        private sealed class SliceAsPager(ISlice slice) : IPager
+        {
+            public int CurrentPageIndex { get => slice.CurrentPageIndex; set => throw new NotSupportedException(); }
+            public int PageSize { get => slice.PageSize; set => throw new NotSupportedException(); }
+            public int TotalItemCount { get => slice.EndItemIndex; set => throw new NotSupportedException(); }
+            public int TotalPageCount => slice.HasNextPage ? slice.CurrentPageIndex + 1 : slice.CurrentPageIndex;
+            public bool HasPreviousPage => slice.HasPreviousPage;
+            public bool HasNextPage => slice.HasNextPage;
+            public bool IsFirstPage => slice.CurrentPageIndex == 1;
+            public bool IsLastPage => !slice.HasNextPage;
+            public int StartItemIndex => slice.StartItemIndex;
+            public int EndItemIndex => slice.EndItemIndex;
+        }
+
+        /// <summary>
+        /// Renders the paging control. Shared by the HTML helper and <see cref="PagerTagHelper"/>.
+        /// </summary>
+        internal static HtmlString Render(IPager pager, Func<int, string?> generatePageUrl, PagerOptions pagerOptions)
+        {
+            if (pager == null) throw new ArgumentNullException(nameof(pager));
+            if (generatePageUrl == null) throw new ArgumentNullException(nameof(generatePageUrl));
+            if (pagerOptions == null) throw new ArgumentNullException(nameof(pagerOptions));
+
             int firstPageToDisplay = 1;
             int lastPageToDisplay = pager.TotalPageCount;
             int pageNumbersToDisplay = lastPageToDisplay;
 
             if (pagerOptions.PagesToDisplay.HasValue && pager.TotalPageCount > pagerOptions.PagesToDisplay)
             {
-                int maxPageNumbersToDisplay = pagerOptions.PagesToDisplay.Value;
+                int maxPageNumbersToDisplay = Math.Max(1, pagerOptions.PagesToDisplay.Value);
                 firstPageToDisplay = pager.CurrentPageIndex - (maxPageNumbersToDisplay / 2);
                 if (firstPageToDisplay < 1)
                     firstPageToDisplay = 1;
                 pageNumbersToDisplay = maxPageNumbersToDisplay;
                 lastPageToDisplay = firstPageToDisplay + pageNumbersToDisplay - 1;
                 if (lastPageToDisplay > pager.TotalPageCount)
+                {
                     firstPageToDisplay = pager.TotalPageCount - maxPageNumbersToDisplay + 1;
+                    lastPageToDisplay = pager.TotalPageCount;
+                }
             }
 
-            List<TagBuilder> listItemLinks = new List<TagBuilder>();
+            List<TagBuilder> listItemLinks = [];
 
             if (pagerOptions.DisplayFirstPage == PagerDisplayMode.Always || (pagerOptions.DisplayFirstPage == PagerDisplayMode.IfNeeded && firstPageToDisplay > 1))
                 listItemLinks.Add(First(pager, generatePageUrl, pagerOptions));
@@ -77,7 +153,7 @@ namespace P.Pager.Mvc.Core
                 {
                     //show delimiter between page numbers
                     if (i > firstPageToDisplay && !string.IsNullOrWhiteSpace(pagerOptions.TextForDelimiter))
-                        listItemLinks.Add(AddToListItem(pagerOptions.TextForDelimiter, pagerOptions.ClassToLi));
+                        listItemLinks.Add(AddToListItem(Localize(pagerOptions, pagerOptions.TextForDelimiter), pagerOptions.ClassToLi));
 
                     //show page number link
                     listItemLinks.Add(Page(i, pager, generatePageUrl, pagerOptions));
@@ -95,85 +171,88 @@ namespace P.Pager.Mvc.Core
 
             string listItemLinksString = listItemLinks.Aggregate(new StringBuilder(), (sb, listItem) => sb.Append(TagBuilderToString(listItem)), sb => sb.ToString());
 
-            var ul = new TagBuilder("ul");
+            TagBuilder ul = new("ul");
             AppendHtml(ul, listItemLinksString);
-            ul.AddCssClass(pagerOptions.ClassToUl);
-            var outerDiv = new TagBuilder("div");
-            outerDiv.AddCssClass(pagerOptions.ClassToPagerContainer);
+            AddCssClass(ul, pagerOptions.ClassToUl);
+            TagBuilder outerDiv = new("div");
+            AddCssClass(outerDiv, pagerOptions.ClassToPagerContainer);
+            outerDiv.Attributes["role"] = "navigation";
+            string? ariaLabel = Localize(pagerOptions, pagerOptions.AriaLabel);
+            if (!string.IsNullOrWhiteSpace(ariaLabel))
+                outerDiv.Attributes["aria-label"] = ariaLabel;
             AppendHtml(outerDiv, TagBuilderToString(ul));
             return new HtmlString(TagBuilderToString(outerDiv));
         }
 
-        private static TagBuilder First(IPager pager, Func<int, string> generatePageUrl, PagerOptions pagerOptions)
+        private static TagBuilder First(IPager pager, Func<int, string?> generatePageUrl, PagerOptions pagerOptions)
         {
             const int targetPageNumber = 1;
-            var first = new TagBuilder("a");
-            AppendHtml(first, string.Format(pagerOptions.TextToFirstPage, targetPageNumber));
-
-            first.AddCssClass(pagerOptions.PageClass);
+            TagBuilder first = new("a");
+            AppendHtml(first, LocalizeAndFormat(pagerOptions, pagerOptions.TextToFirstPage, targetPageNumber));
+            AddCssClass(first, pagerOptions.PageClass);
 
             if (pager.IsFirstPage)
-                return AddToListItem(first, pagerOptions, pagerOptions.ClassToLi + " disabled");
+                return DisabledLink(first, pagerOptions);
 
             first.Attributes["href"] = generatePageUrl(targetPageNumber);
             return AddToListItem(first, pagerOptions, pagerOptions.ClassToLi);
         }
 
-        private static TagBuilder Previous(IPager pager, Func<int, string> generatePageUrl, PagerOptions pagerOptions)
+        private static TagBuilder Previous(IPager pager, Func<int, string?> generatePageUrl, PagerOptions pagerOptions)
         {
             int targetPageNumber = pager.CurrentPageIndex - 1;
-            var previous = new TagBuilder("a");
-            AppendHtml(previous, string.Format(pagerOptions.TextToPreviousPage, targetPageNumber));
-            previous.Attributes["rel"] = "prev";
-            previous.AddCssClass(pagerOptions.PageClass);
+            TagBuilder previous = new("a");
+            AppendHtml(previous, LocalizeAndFormat(pagerOptions, pagerOptions.TextToPreviousPage, targetPageNumber));
+            AddCssClass(previous, pagerOptions.PageClass);
 
             if (!pager.HasPreviousPage)
-                return AddToListItem(previous, pagerOptions, pagerOptions.ClassToLi + " disabled");
+                return DisabledLink(previous, pagerOptions);
 
+            previous.Attributes["rel"] = "prev";
             previous.Attributes["href"] = generatePageUrl(targetPageNumber);
             return AddToListItem(previous, pagerOptions, pagerOptions.ClassToLi);
         }
 
-        private static TagBuilder Page(int i, IPager pager, Func<int, string> generatePageUrl, PagerOptions pagerOptions)
+        private static TagBuilder Page(int i, IPager pager, Func<int, string?> generatePageUrl, PagerOptions pagerOptions)
         {
-            string format = string.Format(pagerOptions.TextToIndividualPages, i);
-            int targetPageNumber = i;
-            var page = new TagBuilder("a");
-            SetInnerText(page, format);
-            page.AddCssClass(pagerOptions.PageClass);
+            TagBuilder page = new("a");
+            SetInnerText(page, LocalizeAndFormat(pagerOptions, pagerOptions.TextToIndividualPages, i));
+            AddCssClass(page, pagerOptions.PageClass);
             if (i == pager.CurrentPageIndex)
-                return AddToListItem(page, pagerOptions, pagerOptions.ClassToLi + " " + pagerOptions.ClassToActiveLi);
+            {
+                page.Attributes["aria-current"] = "page";
+                AddCssClass(page, pagerOptions.ClassToActiveLink);
+                return AddToListItem(page, pagerOptions, JoinClasses(pagerOptions.ClassToLi, pagerOptions.ClassToActiveLi));
+            }
 
-            page.Attributes["href"] = generatePageUrl(targetPageNumber);
+            page.Attributes["href"] = generatePageUrl(i);
             return AddToListItem(page, pagerOptions, null);
         }
 
-        private static TagBuilder Next(IPager pager, Func<int, string> generatePageUrl, PagerOptions pagerOptions)
+        private static TagBuilder Next(IPager pager, Func<int, string?> generatePageUrl, PagerOptions pagerOptions)
         {
             int targetPageNumber = pager.CurrentPageIndex + 1;
-            var next = new TagBuilder("a");
-            AppendHtml(next, string.Format(pagerOptions.TextToNextPage, targetPageNumber));
-            next.Attributes["rel"] = "next";
-
-            next.AddCssClass(pagerOptions.PageClass);
+            TagBuilder next = new("a");
+            AppendHtml(next, LocalizeAndFormat(pagerOptions, pagerOptions.TextToNextPage, targetPageNumber));
+            AddCssClass(next, pagerOptions.PageClass);
 
             if (!pager.HasNextPage)
-                return AddToListItem(next, pagerOptions, pagerOptions.ClassToLi + " disabled");
+                return DisabledLink(next, pagerOptions);
 
+            next.Attributes["rel"] = "next";
             next.Attributes["href"] = generatePageUrl(targetPageNumber);
             return AddToListItem(next, pagerOptions, pagerOptions.ClassToLi);
         }
 
-        private static TagBuilder Last(IPager pager, Func<int, string> generatePageUrl, PagerOptions pagerOptions)
+        private static TagBuilder Last(IPager pager, Func<int, string?> generatePageUrl, PagerOptions pagerOptions)
         {
             int targetPageNumber = pager.TotalPageCount;
-            var last = new TagBuilder("a");
-            AppendHtml(last, string.Format(pagerOptions.TextToLastPage, targetPageNumber));
-
-            last.AddCssClass(pagerOptions.PageClass);
+            TagBuilder last = new("a");
+            AppendHtml(last, LocalizeAndFormat(pagerOptions, pagerOptions.TextToLastPage, targetPageNumber));
+            AddCssClass(last, pagerOptions.PageClass);
 
             if (pager.IsLastPage)
-                return AddToListItem(last, pagerOptions, pagerOptions.ClassToLi + " disabled");
+                return DisabledLink(last, pagerOptions);
 
             last.Attributes["href"] = generatePageUrl(targetPageNumber);
             return AddToListItem(last, pagerOptions, pagerOptions.ClassToLi);
@@ -181,59 +260,109 @@ namespace P.Pager.Mvc.Core
 
         private static TagBuilder PageCountAndCurrentPage(IPager pager, PagerOptions pagerOptions)
         {
-            var text = new TagBuilder("a");
-            text.AddCssClass(pagerOptions.PageClass);
-            SetInnerText(text, string.Format(pagerOptions.PagerTextFormat, pager.CurrentPageIndex, pager.TotalPageCount));
-            return AddToListItem(text, pagerOptions, pagerOptions.ClassToLi + " disabled");
+            TagBuilder text = new(TextElement(pagerOptions)); // plain text: <a> without href (9.0 markup) or <span>
+            AddCssClass(text, pagerOptions.PageClass);
+            SetInnerText(text, LocalizeAndFormat(pagerOptions, pagerOptions.PagerTextFormat, pager.CurrentPageIndex, pager.TotalPageCount));
+            return AddToListItem(text, pagerOptions, JoinClasses(pagerOptions.ClassToLi, pagerOptions.ClassToDisabledLi));
         }
 
         private static TagBuilder DisplayEntriesText(IPager pager, PagerOptions pagerOptions)
         {
-            var text = new TagBuilder("a");
-            text.AddCssClass(pagerOptions.PageClass);
-            SetInnerText(text, string.Format(pagerOptions.EntriesTextFormat, pager.StartItemIndex, pager.EndItemIndex, pager.TotalItemCount));
-            return AddToListItem(text, pagerOptions, pagerOptions.ClassToLi + " disabled");
+            TagBuilder text = new(TextElement(pagerOptions)); // plain text: <a> without href (9.0 markup) or <span>
+            AddCssClass(text, pagerOptions.PageClass);
+            SetInnerText(text, LocalizeAndFormat(pagerOptions, pagerOptions.EntriesTextFormat, pager.StartItemIndex, pager.EndItemIndex, pager.TotalItemCount));
+            return AddToListItem(text, pagerOptions, JoinClasses(pagerOptions.ClassToLi, pagerOptions.ClassToDisabledLi));
         }
 
         private static TagBuilder Ellipses(PagerOptions pagerOptions)
         {
-            var a = new TagBuilder("a");
-            a.AddCssClass(pagerOptions.PageClass);
+            TagBuilder a = new(TextElement(pagerOptions)); // plain text: <a> without href (9.0 markup) or <span>
+            AddCssClass(a, pagerOptions.PageClass);
             AppendHtml(a, pagerOptions.EllipsesFormat);
-            return AddToListItem(a, pagerOptions, pagerOptions.ClassToLi + " disabled");
+            return AddToListItem(a, pagerOptions, JoinClasses(pagerOptions.ClassToLi, pagerOptions.ClassToDisabledLi));
         }
 
-        private static void AppendHtml(TagBuilder tagBuilder, string innerHtml)
+        private static string TextElement(PagerOptions pagerOptions) =>
+            string.Equals(pagerOptions.TextElement, "span", StringComparison.OrdinalIgnoreCase) ? "span" : "a";
+
+        private static TagBuilder DisabledLink(TagBuilder link, PagerOptions pagerOptions)
         {
-            tagBuilder.InnerHtml.AppendHtml(innerHtml);
+            link.Attributes["aria-disabled"] = "true";
+            AddCssClass(link, pagerOptions.ClassToDisabledLink);
+            return AddToListItem(link, pagerOptions, JoinClasses(pagerOptions.ClassToLi, pagerOptions.ClassToDisabledLi));
         }
 
-        private static void SetInnerText(TagBuilder tagBuilder, string innerText)
+        private static string? Localize(PagerOptions pagerOptions, string? text)
         {
-            tagBuilder.InnerHtml.SetContent(innerText);
+            return pagerOptions.Localizer == null || string.IsNullOrEmpty(text) ? text : pagerOptions.Localizer[text!].Value;
         }
 
-        private static TagBuilder AddToListItem(string text, string cssClass)
+        private static string? LocalizeAndFormat(PagerOptions pagerOptions, string? format, params object[] args)
         {
-            var li = new TagBuilder("li");
-            li.AddCssClass(cssClass);
+            return SafeFormat(Localize(pagerOptions, format), args);
+        }
+
+        /// <summary>
+        /// Formats a user-supplied label. Labels that contain braces but aren't valid format strings
+        /// (inline SVG, CSS, Alpine/Vue attributes, ...) are returned as-is instead of throwing.
+        /// </summary>
+        private static string? SafeFormat(string? format, params object[] args)
+        {
+            if (string.IsNullOrEmpty(format))
+                return format;
+            try
+            {
+                return string.Format(format, args);
+            }
+            catch (FormatException)
+            {
+                return format;
+            }
+        }
+
+        private static string? JoinClasses(string? a, string? b)
+        {
+            return string.IsNullOrWhiteSpace(a) ? b : string.IsNullOrWhiteSpace(b) ? a : a + " " + b;
+        }
+
+        private static void AddCssClass(TagBuilder tagBuilder, string? cssClass)
+        {
+            if (!string.IsNullOrWhiteSpace(cssClass))
+                tagBuilder.AddCssClass(cssClass);
+        }
+
+        private static void AppendHtml(TagBuilder tagBuilder, string? innerHtml)
+        {
+            if (innerHtml != null)
+                tagBuilder.InnerHtml.AppendHtml(innerHtml);
+        }
+
+        private static void SetInnerText(TagBuilder tagBuilder, string? innerText)
+        {
+            if (innerText != null)
+                tagBuilder.InnerHtml.SetContent(innerText);
+        }
+
+        private static TagBuilder AddToListItem(string? text, string? cssClass)
+        {
+            TagBuilder li = new("li");
+            AddCssClass(li, cssClass);
             SetInnerText(li, text);
             return li;
         }
 
-        private static TagBuilder AddToListItem(TagBuilder inner, PagerOptions pagerOptions, string cssClass)
+        private static TagBuilder AddToListItem(TagBuilder inner, PagerOptions pagerOptions, string? cssClass)
         {
-            var li = new TagBuilder("li");
-            li.AddCssClass(cssClass ?? pagerOptions.ClassToLi);
+            TagBuilder li = new("li");
+            AddCssClass(li, cssClass ?? pagerOptions.ClassToLi);
             AppendHtml(li, TagBuilderToString(inner));
             return li;
         }
 
-        private static string TagBuilderToString(TagBuilder tagBuilder, TagRenderMode renderMode = TagRenderMode.Normal)
+        private static string TagBuilderToString(TagBuilder tagBuilder)
         {
-            var encoder = HtmlEncoder.Create(new TextEncoderSettings());
-            var writer = new System.IO.StringWriter() as TextWriter;
-            tagBuilder.WriteTo(writer, encoder);
+            using StringWriter writer = new();
+            tagBuilder.WriteTo(writer, HtmlEncoder.Default);
             return writer.ToString();
         }
     }

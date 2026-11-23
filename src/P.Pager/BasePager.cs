@@ -13,7 +13,7 @@ namespace P.Pager
         /// <summary>
         /// Appending current child to this variable. 
         /// </summary>
-        protected readonly List<T> Childset = new List<T>();
+        protected readonly List<T> Childset = [];
 
         /// <summary>
         /// Parameterless constructor.
@@ -32,12 +32,12 @@ namespace P.Pager
         {
             if (pageIndex < 1)
             {
-                throw new ArgumentOutOfRangeException($"pageIndex = {pageIndex}. pageIndex cannot be less than 1.");
+                throw new ArgumentOutOfRangeException(nameof(pageIndex), pageIndex, "pageIndex cannot be less than 1.");
             }
 
-            if (pageSize < 0)
+            if (pageSize < 0) // 0 is allowed, as in 9.0 (an empty page)
             {
-                throw new ArgumentOutOfRangeException($"pageSize = {pageSize}. PageSize cannot be less than 1.");
+                throw new ArgumentOutOfRangeException(nameof(pageSize), pageSize, "pageSize cannot be negative.");
             }
 
             TotalItemCount = totalItemCount;
@@ -48,22 +48,25 @@ namespace P.Pager
         /// <summary>
         /// Index of child set within the parent list.
         /// </summary>
+        /// <remarks>Deprecated setter: changing paging metadata after construction makes it inconsistent with the items. It will be removed in v10.</remarks>
         public int CurrentPageIndex { get; set; }
 
         /// <summary>
         /// Size of individual child set.
         /// </summary>
+        /// <remarks>Deprecated setter: changing paging metadata after construction makes it inconsistent with the items. It will be removed in v10.</remarks>
         public int PageSize { get; set; }
 
         /// <summary>
         /// Total number of items in parent list.
         /// </summary>
+        /// <remarks>Deprecated setter: changing paging metadata after construction makes it inconsistent with the items. It will be removed in v10.</remarks>
         public int TotalItemCount { get; set; }
 
         /// <summary>
         /// Total number of child sets in parent list.
         /// </summary>
-        public int TotalPageCount { get { return (int)Math.Ceiling(TotalItemCount / (double)PageSize); } }
+        public int TotalPageCount { get { return PageSize > 0 ? (int)((TotalItemCount + (long)PageSize - 1) / PageSize) : 0; } }
 
         /// <summary>
         /// Returns true if this is not first child.
@@ -83,12 +86,12 @@ namespace P.Pager
         /// <summary>
         /// Returns true if this is the last child.
         /// </summary>
-        public bool IsLastPage { get { return CurrentPageIndex == TotalPageCount; } }
+        public bool IsLastPage { get { return CurrentPageIndex >= TotalPageCount; } }
 
         /// <summary>
-        /// Sub-index of first item in paged child.
+        /// Sub-index of first item in paged child. 0 when there are no items.
         /// </summary>
-        public int StartItemIndex { get { return ((CurrentPageIndex - 1) * PageSize) + 1; } }
+        public int StartItemIndex { get { return TotalItemCount == 0 ? 0 : ((CurrentPageIndex - 1) * PageSize) + 1; } }
 
         /// <summary>
         /// Sub-index of last item in paged child.
