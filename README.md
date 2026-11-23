@@ -2,7 +2,9 @@
 
 ## What is this?
 
-P.Pager is a lightweight package for paging through any `IEnumerable`/`IQueryable`: chop it up into "pages" and grab a specific page by index. The core package (.NET Standard 2.0+) works in any .NET app: ASP.NET Core, Blazor, console, WinForms, WPF, MAUI. P.Pager.Mvc.Core and P.Pager.Blazor render the pager with Bootstrap-compatible markup by default, or with opt-in themes: framework-neutral with a built-in stylesheet, Bootstrap, Bulma, Tailwind CSS, Foundation, UIkit and Materialize (see [Styling and themes](#styling-and-themes)).
+P.Pager is a lightweight package for paging through any `IEnumerable`/`IQueryable`: chop it up into "pages" and grab a specific page by index. The core package (.NET Standard 2.0+) works in any .NET app: ASP.NET Core, Blazor, console, WinForms, WPF, MAUI. P.Pager.Mvc.Core and P.Pager.Blazor render framework-neutral markup with a built-in stylesheet by default, and ship themes for Bootstrap, Bulma, Tailwind CSS, Foundation, UIkit and Materialize (see [Styling and themes](#styling-and-themes)).
+
+> **Upgrading from 9.x?** See the [10.0 upgrade guide](docs/version-history.md#upgrading-from-9x). One line keeps the 9.x markup: `PagerSettings.DefaultTheme = PagerTheme.Classic;`.
 
 ## How do I use it?
 
@@ -24,7 +26,15 @@ Install [P.Pager.Mvc.Core](https://www.nuget.org/packages/P.Pager.Mvc.Core/3.0.0
 Install-Package P.Pager.Mvc.Core -Version 3.0.0
 ```
 
-#### .NET 6 and above
+#### .NET 6 and 7
+
+Install [P.Pager.Mvc.Core 9.1.0](https://www.nuget.org/packages/P.Pager.Mvc.Core/9.1.0) via [NuGet](http://nuget.org) (the last version that supports .NET 6 and 7). This will install [P.Pager](https://www.nuget.org/packages/P.Pager/) automatically.
+
+```
+Install-Package P.Pager.Mvc.Core -Version 9.1.0
+```
+
+#### .NET 8 and above
 
 Install [P.Pager.Mvc.Core](https://www.nuget.org/packages/P.Pager.Mvc.Core/) via [NuGet](http://nuget.org). This will install [P.Pager](https://www.nuget.org/packages/P.Pager/) automatically.
 
@@ -265,11 +275,9 @@ Parameters: `PagesToDisplay` (5), `ShowFirstLast`, `ShowPreviousNext`, `ShowPage
 
 ## Styling and themes
 
-The MVC pager renders the same markup as 9.0 by default (`PagerTheme.Classic`: Bootstrap classes inside `<div class="container">`), so upgrading changes nothing. Everything below is opt-in.
+### Default theme
 
-### Framework-neutral theme
-
-`PagerTheme.Neutral` uses framework-neutral classes (`pager`, `pager-list`, `pager-item`, `pager-link`, `is-active`, `is-disabled`) and is the default of the Blazor component. Turn it on for MVC with `PagerSettings.DefaultTheme = PagerTheme.Neutral;` (or `PrePagerOptions.Neutral` for one pager), and include the stylesheet that ships in the package:
+By default the pager uses framework-neutral classes (`pager`, `pager-list`, `pager-item`, `pager-link`, `is-active`, `is-disabled`), from `PagerTheme.Neutral`. Include the stylesheet that ships in the package:
 
 ```html
 <!-- MVC / Razor Pages -->
@@ -290,9 +298,9 @@ A `PagerTheme` is the set of class names; the same theme works in MVC and Blazor
 
 | Theme | For |
 | --- | --- |
-| `PagerTheme.Classic` | The 9.0 markup (default for MVC). Bootstrap classes plus `class="container"` on the wrapper. |
+| `PagerTheme.Classic` | The 9.x markup: Bootstrap classes plus `class="container"` on the wrapper. Use it to keep 9.x output after upgrading. |
 | `PagerTheme.Bootstrap` | Bootstrap 4 and 5, without the `container` class (which adds Bootstrap's layout padding). |
-| `PagerTheme.Neutral` | No framework; style with `pager.css` (default for Blazor). |
+| `PagerTheme.Neutral` | No framework; style with `pager.css`. The default. |
 | `PagerTheme.Bulma`, `PagerTheme.Tailwind`, `PagerTheme.Foundation`, `PagerTheme.UIkit`, `PagerTheme.Materialize` | Those frameworks. For Tailwind, safelist the classes. |
 
 ```csharp
@@ -320,7 +328,7 @@ PagerTheme theme = PagerTheme.Bootstrap.Clone();
 theme.List = "pagination justify-content-center";
 ```
 
-> **Upgrading:** nothing changes unless you choose a theme. If you use Bootstrap, `PagerTheme.Bootstrap` is the cleaner choice for new code: same look, without the `container` class on the wrapper.
+> **Upgrading from 9.x:** add `PagerSettings.DefaultTheme = PagerTheme.Classic;` to keep the exact 9.x markup, or `PagerTheme.Bootstrap` for the same Bootstrap look without the `container` class on the wrapper.
 
 ## PagerOptions
 
@@ -462,7 +470,7 @@ public enum PagerDisplayMode
 
 ![alt text](https://raw.githubusercontent.com/BlogArray/P.Pager/master/img/6.classiclastfirst.PNG)
 
-7. With a CSS framework: see [Styling and themes](#styling-and-themes). Every preset above can be combined with a theme, for example `PrePagerOptions.ClassicPager.ApplyTheme(PagerTheme.Bootstrap)`. The screenshots above use the Bootstrap theme.
+7. With a CSS framework: see [Styling and themes](#styling-and-themes). Every preset above can be combined with a theme, for example `PrePagerOptions.ClassicPager.ApplyTheme(PagerTheme.Bootstrap)`. The screenshots above use the Bootstrap theme (`PagerTheme.Classic`, the 9.x default).
 
 ### Localization
 

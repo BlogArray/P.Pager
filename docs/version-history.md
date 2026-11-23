@@ -1,5 +1,27 @@
 # Version history
 
+## 10.0.0
+
+A major version: it changes defaults and removes deprecated APIs. Every intentional break is listed below (and in
+`CompatibilitySuppressions.xml`, which package validation checks against the published 9.0.0).
+
+**Target frameworks:** P.Pager: .NET Standard 2.0, .NET Standard 2.1, .NET 8, 9, 10 and 11. P.Pager.Mvc.Core and P.Pager.Blazor: .NET 8, 9, 10 and 11.
+
+**Fixes:** `SortMap.Add` now rejects names like `" -name"` (leading space before `-` or `+`), which were accepted but could never be matched.
+
+### Upgrading from 9.x
+
+| Change in 10.0 | What to do |
+| --- | --- |
+| The default theme is `PagerTheme.Neutral` (classes `pager`, `pager-list`, `pager-item`, `pager-link`, `is-active`, `is-disabled`; text items are `<span>`). 9.x rendered Bootstrap classes inside `<div class="container">`. | To keep the 9.x markup, add `PagerSettings.DefaultTheme = PagerTheme.Classic;` at startup. For Bootstrap without the `container` class, use `PagerTheme.Bootstrap`. Otherwise include `_content/P.Pager.Mvc.Core/pager.css`. |
+| P.Pager.Mvc.Core targets .NET 8, 9, 10 and 11 (no longer .NET 6 and 7). | .NET 6/7 apps stay on 9.1.0. |
+| `pageSize` must be at least 1: `ToPagerList(page, 0)` throws `ArgumentOutOfRangeException` (9.x returned an empty page). | Validate or clamp untrusted sizes, for example with `PagerExtension.ClampPageSize` or `PageRequest`. |
+| `PagerExtension.ToListAsync(IEnumerable<T>, CancellationToken)` is removed. | Use your provider's `ToListAsync` (for example EF Core's), or `ToPagerListAsync(page, size, countAsync, toListAsync)`. |
+| `IPager.CurrentPageIndex`, `PageSize` and `TotalItemCount` are read-only (`BasePager<T>` setters are `protected`). | Create a new page instead of changing one, for example with `ToPagerList` or `Map`. |
+| `Html.Pager(...)` and `Html.SlicePager(...)` return `IHtmlContent` instead of `HtmlString`. | Razor views need no change. Code that stores the result in an `HtmlString` variable should use `IHtmlContent` (or `var`). |
+
+Apps that need none of the above can upgrade without code changes.
+
 ## 9.1.0
 
 A backward-compatible update of 9.0.0. Apps that upgrade get the same HTML, the same data and the same API as with 9.0.0
