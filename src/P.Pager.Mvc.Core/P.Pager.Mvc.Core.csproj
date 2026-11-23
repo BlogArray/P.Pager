@@ -1,27 +1,13 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <!-- Shared settings (version, metadata, SourceLink, AOT, ...) are in ..\Directory.Build.props -->
+  <!-- Razor SDK so the package can ship pager.css as a static web asset: ~/_content/P.Pager.Mvc.Core/pager.css -->
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <!-- net6.0/net7.0 stay for 9.x: 9.0.0 shipped them, so dropping them would stop .NET 6/7 apps from upgrading. Drop in 10.0. -->
+    <TargetFrameworks>net6.0;net7.0;net8.0;net9.0;net10.0</TargetFrameworks>
     <Title>P.Pager.Mvc.Core</Title>
-    <Company>BlogArray</Company>
-    <Authors>Sisindry Medagam</Authors>
     <Description>Lightweight package for easily paging through any IEnumerable/IQueryable in .NET Core Mvc Web Application.</Description>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIconUrl>https://raw.githubusercontent.com/BlogArray/P.Pager/master/icon.png</PackageIconUrl>
-    <PackageIcon>icon.png</PackageIcon>
-    <PackageProjectUrl>https://github.com/BlogArray/P.Pager</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/BlogArray/P.Pager.git</RepositoryUrl>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryType>git</RepositoryType>
     <PackageTags>Paged list, paging in .net core, asp.net pagedlist, paging in .net, paging in mvc, MvcPager, MvcPagedList, PaginationInMvc, MvcPagination</PackageTags>
-    <NeutralLanguage>en-IN</NeutralLanguage>
-    <SignAssembly>true</SignAssembly>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Version>9.0</Version>
-    <AssemblyVersion>9.0.0.0</AssemblyVersion>
-    <FileVersion>9.0.0.0</FileVersion>
-    <Copyright>Copyright Sisindry Medagam, BlogArray © 2024</Copyright>
-    <PackageReleaseNotes>v9.0 - P.Pager now Support .Net Core 6 above.</PackageReleaseNotes>
+    <PackageReleaseNotes>v9.1 - Backward compatible with 9.0. Supports .NET 6 and above. Same default markup as 9.0; opt-in themes (Neutral with pager.css, Bootstrap, Bulma, Tailwind, Foundation, UIkit, Materialize).</PackageReleaseNotes>
     <AssemblyOriginatorKeyFile>p.pager.mvc.core.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
@@ -30,12 +16,6 @@
   <ItemGroup>
     <ProjectReference Include="..\P.Pager\P.Pager.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <None  Include="..\..\icon.png" Pack="true" PackagePath="\"/>
-    <None  Include="..\..\README.md" Pack="true" PackagePath="\"/>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\..\icon.png" Link="icon.png" CopyToOutputDirectory="Always" />
-    <Content Include="..\..\README.md" Link="README.md" CopyToOutputDirectory="Always" />
-  </ItemGroup>
+  <!-- wwwroot/pager.css is a copy of ..\P.Pager.Blazor\wwwroot\pager.css (a test checks they stay identical).
+       A linked file can't be used: static web assets need a physical wwwroot folder when referenced as a project. -->
 </Project>
