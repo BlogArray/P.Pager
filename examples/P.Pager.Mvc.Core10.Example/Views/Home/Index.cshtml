@@ -1,0 +1,132 @@
+﻿@using P.Pager.Mvc.Core
+@using P.Pager
+@model IEnumerable<P.Pager.Mvc.Core10.Example.Models.Member>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Company)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Company)
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+
+<h3>Pager Configurations</h3>
+<h6>Default Pager Control <small>(PagerTheme.Neutral, styled by _content/P.Pager.Mvc.Core/pager.css)</small></h6>
+@Html.Pager((IPager)Model, page => Url.Action("Index", new { page }))
+
+<h6>Tag Helper <small>(links keep the current query string, e.g. ?sort=name)</small></h6>
+<pager for="(IPager)Model" />
+
+<h6>HTML helper without a URL function <small>(same as the Tag Helper)</small></h6>
+@Html.Pager((IPager)Model, PrePagerOptions.ClassicPager)
+
+<h3>Themes</h3>
+<h6>Classic <small>(new PagerOptions(PagerTheme.Classic): the 9.x markup)</small></h6>
+@Html.Pager((IPager)Model, new PagerOptions(PagerTheme.Classic))
+
+<h6>Bootstrap <small>(PrePagerOptions.Bootstrap, or PagerSettings.DefaultTheme = PagerTheme.Bootstrap for every pager)</small></h6>
+@Html.Pager((IPager)Model, PrePagerOptions.Bootstrap)
+
+<h6>Bootstrap, centered and small <small>(adjust a copy of a theme)</small></h6>
+@{
+    PagerTheme bootstrapSmall = PagerTheme.Bootstrap.Clone();
+    bootstrapSmall.List = "pagination pagination-sm justify-content-center";
+}
+@Html.Pager((IPager)Model, new PagerOptions().ApplyTheme(bootstrapSmall))
+
+<h6>Layout preset + theme <small>(PrePagerOptions.ClassicPagerWithFirstAndLastPages.ApplyTheme(PagerTheme.Bootstrap))</small></h6>
+@Html.Pager((IPager)Model, PrePagerOptions.ClassicPagerWithFirstAndLastPages.ApplyTheme(PagerTheme.Bootstrap))
+
+<h3>Layout presets</h3>
+<h6>Minimal Pager</h6>
+@Html.Pager((IPager)Model, page => Url.Action("Index", new { page }), PrePagerOptions.Minimal)
+
+<h6>Minimal Pager with Pager Text (Page Count Text)</h6>
+@Html.Pager((IPager)Model, page => Url.Action("Index", new { page }), PrePagerOptions.MinimalWithPagerText)
+
+<h6>Minimal Pager with entries text (Item Count Text)</h6>
+@Html.Pager((IPager)Model, page => Url.Action("Index", new { page }), PrePagerOptions.MinimalWithEntriesText)
+
+<h6>Classic Pager <small>(always shows Previous/Next links, but sometimes they are disabled)</small></h6>
+@Html.Pager((IPager)Model, page => Url.Action("Index", new { page }), PrePagerOptions.ClassicPager)
+
+<h6>Classic Pager <small>(Classic Pager with First and Last links, but sometimes they are disabled)</small></h6>
+@Html.Pager((IPager)Model, page => Url.Action("Index", new { page }), PrePagerOptions.ClassicPagerWithFirstAndLastPages)
+
+<h6>Shows custom page numbers, let say 10 pages.</h6>
+@Html.Pager((IPager)Model, page => Url.Action("Index", new { page }), new PagerOptions
+{
+    PagesToDisplay = 10
+})
+
+<h6>With Custom Page numbers</h6>
+@Html.Pager((IPager)Model, page => Url.Action("Index", new { page }), new PagerOptions
+{
+    TextToIndividualPages = "Page-{0}"
+})
+
+<h6>Custom Wording. (<i>Can use for translation also.</i>)</h6>
+@Html.Pager((IPager)Model, page => Url.Action("Index", new { page }), new PagerOptions
+{
+    TextToPreviousPage = "Previous Page",
+    TextToNextPage = "Next Page",
+    TextToFirstPage = "First Page",
+    TextToLastPage = "Last Page"
+})
+
+<h6>Custom options.</h6>
+@Html.Pager((IPager)Model, page => Url.Action("Index", new { page }), new PagerOptions
+{
+    TextToPreviousPage = "previous",
+    TextToNextPage = "next",
+    TextToFirstPage = "first",
+    TextToLastPage = "last",
+    ClassToPagerContainer = null,
+    ClassToUl = "list-inline",
+    ClassToLi = "list-inline-item",
+    PageClass = null,
+    ClassToActiveLi = "fw-bold",
+    TextForDelimiter = " | "
+})
+
+<h6>
+    Custom Icon Options (Bootstrap Icons, Bootstrap theme)
+</h6>
+@Html.Pager((IPager)Model, page => Url.Action("Index", new { page }), new PagerOptions(PagerTheme.Bootstrap)
+{
+    TextToPreviousPage = "<i class='bi bi-skip-start'></i>",
+    TextToNextPage = "<i class='bi bi-skip-end'></i>",
+    TextToFirstPage = "<i class='bi bi-skip-backward'></i>",
+    TextToLastPage = "<i class='bi bi-skip-forward'></i>"
+})

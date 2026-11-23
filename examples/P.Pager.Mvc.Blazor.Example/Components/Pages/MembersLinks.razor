@@ -1,0 +1,38 @@
+@page "/members-links"
+@inject MemberStore Store
+
+<PageTitle>Pager (links)</PageTitle>
+
+<h1>Pager (links)</h1>
+
+<p>
+    Static server rendering: no interactivity, the page comes from the query string (<code>?page=3</code>) and
+    <code>PageUrl</code> renders real links, so pages can be bookmarked, shared and crawled.
+    Out-of-range pages are clamped, so <a href="members-links?page=999">?page=999</a> shows the last page.
+</p>
+
+<MemberTable Items="pager" />
+
+<Pagination Pager="pager" PageUrl="@(p => $"members-links?page={p}&size={pager.PageSize}")" />
+
+<p class="mt-3">
+    Page size:
+    @foreach (int size in new[] { 10, 20, 50 })
+    {
+        <a class="me-2" href="members-links?page=1&size=@size">@size</a>
+    }
+</p>
+
+@code {
+    [SupplyParameterFromQuery] public int? Page { get; set; }
+    [SupplyParameterFromQuery] public int? Size { get; set; }
+
+    private IPager<Member> pager = null!;
+
+    protected override void OnParametersSet()
+    {
+        // Query-string values are untrusted: ClampPageSize defaults and caps them.
+        int size = PagerExtension.ClampPageSize(Size, defaultPageSize: 10, maxPageSize: 50);
+        pager = Store.Members.OrderBy(m => m.Id).ToPagerList(Page ?? 1, size);
+    }
+}

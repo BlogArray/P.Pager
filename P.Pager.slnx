@@ -8,6 +8,8 @@
     <File Path="docs/version-history.md" />
   </Folder>
   <Folder Name="/examples/">
+    <Project Path="examples/P.Pager.Mvc.Blazor.Example/P.Pager.Mvc.Blazor.Example.csproj" />
+    <Project Path="examples/P.Pager.Mvc.Core10.Example/P.Pager.Mvc.Core10.Example.csproj" />
     <Project Path="examples/P.Pager.Mvc.Core9.Example/P.Pager.Mvc.Core9.Example.csproj" />
   </Folder>
   <Folder Name="/img/">

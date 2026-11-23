@@ -1,0 +1,25 @@
+@page "/members-slice"
+@rendermode InteractiveServer
+@inject MemberStore Store
+
+<PageTitle>Slice (no count)</PageTitle>
+
+<h1>Slice (no count)</h1>
+
+<p>
+    <code>ToSlice</code> reads one extra row instead of running a <code>COUNT</code> query, so it only knows whether a
+    next page exists. Use it for large tables where counting is expensive. The pager shows first, previous and next (there is no last page or page numbers without a count).
+</p>
+
+<MemberTable Items="slice" />
+
+<Pagination Slice="slice" OnPageChanged="LoadPage" PreviousText="‹ Newer" NextText="Older ›" />
+
+@code {
+    private ISlice<Member> slice = null!;
+
+    protected override void OnInitialized() => LoadPage(1);
+
+    private void LoadPage(int page) =>
+        slice = Store.Members.OrderByDescending(m => m.Joined).ThenBy(m => m.Id).ToSlice(page, 15);
+}

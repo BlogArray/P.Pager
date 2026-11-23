@@ -1,0 +1,100 @@
+@page "/members"
+@rendermode InteractiveServer
+@inject MemberStore Store
+
+<PageTitle>Pager (interactive)</PageTitle>
+
+<h1>Pager (interactive)</h1>
+
+<p>
+    Buttons with <code>OnPageChanged</code>: the page changes without a page load (Interactive Server).
+    Change the options to see how the component reacts.
+</p>
+
+<div class="row g-3 align-items-end mb-3">
+    <div class="col-auto">
+        <label class="form-label" for="theme">Theme</label>
+        <select id="theme" class="form-select" @bind="themeName">
+            <option value="Neutral">Neutral (default, pager.css)</option>
+            <option value="Bootstrap">Bootstrap</option>
+            <option value="Classic">Classic (9.x markup)</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <label class="form-label" for="size">Page size</label>
+        <select id="size" class="form-select" @bind="pageSize" @bind:after="() => LoadPage(1)">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <label class="form-label" for="window">Page numbers shown</label>
+        <input id="window" class="form-control" type="number" min="1" max="15" @bind="pagesToDisplay" />
+    </div>
+    <div class="col-auto">
+        <div class="form-check">
+            <input id="firstLast" class="form-check-input" type="checkbox" @bind="showFirstLast" />
+            <label class="form-check-label" for="firstLast">First / last</label>
+        </div>
+        <div class="form-check">
+            <input id="numbers" class="form-check-input" type="checkbox" @bind="showPageNumbers" />
+            <label class="form-check-label" for="numbers">Page numbers</label>
+        </div>
+    </div>
+</div>
+
+@if (pager is not null)
+{
+    <p class="text-muted">
+        Showing @pager.StartItemIndex–@pager.EndItemIndex of @pager.TotalItemCount members
+        (page @pager.CurrentPageIndex of @pager.TotalPageCount).
+    </p>
+
+    <MemberTable Items="pager" />
+
+    <Pagination Pager="pager"
+                OnPageChanged="LoadPage"
+                Theme="Theme"
+                PagesToDisplay="Math.Clamp(pagesToDisplay, 1, 15)"
+                ShowFirstLast="showFirstLast"
+                ShowPageNumbers="showPageNumbers" />
+}
+
+<h2 class="h4 mt-5">Custom text and classes</h2>
+<p>Text and single CSS classes can be overridden on top of any theme.</p>
+
+@if (pager is not null)
+{
+    <Pagination Pager="pager"
+                OnPageChanged="LoadPage"
+                FirstText="First"
+                PreviousText="Previous"
+                NextText="Next"
+                LastText="Last"
+                PagesToDisplay="3"
+                ContainerClass="pager demo-rounded" />
+}
+
+@code {
+    private IPager<Member>? pager;
+    private int pageSize = 10;
+    private int pagesToDisplay = 5;
+    private bool showFirstLast = true;
+    private bool showPageNumbers = true;
+    private string themeName = "Neutral";
+
+    private PagerTheme Theme => themeName switch
+    {
+        "Bootstrap" => PagerTheme.Bootstrap,
+        "Classic" => PagerTheme.Classic,
+        _ => PagerTheme.Neutral,
+    };
+
+    protected override void OnInitialized() => LoadPage(1);
+
+    // With EF Core, use ToPagerListAsync(page, size, (q, ct) => q.CountAsync(ct), (q, ct) => q.ToListAsync(ct)).
+    private void LoadPage(int page) =>
+        pager = Store.Members.OrderBy(m => m.Id).ToPagerList(page, pageSize);
+}
