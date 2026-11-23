@@ -55,25 +55,16 @@ namespace P.Pager.Tests
         [InlineData(-1)]
         public void PageSizeBelowOne_Throws(int pageSize)
         {
-            if (pageSize == 0)
-            {
-                // 9.0 compatibility: 0 returns an empty page instead of throwing.
-                IPager<int> page = Items.ToPagerList(1, pageSize);
-                Assert.Empty(page);
-                Assert.Equal(200, page.TotalItemCount);
-                Assert.Empty(Items.AsQueryable().ToPagerList(1, 0));
-                return;
-            }
             Assert.Throws<ArgumentOutOfRangeException>(() => Items.ToPagerList(1, pageSize));
+            Assert.Throws<ArgumentOutOfRangeException>(() => Items.AsQueryable().ToPagerList(1, pageSize));
         }
 
         [Fact]
         public async Task PageSizeBelowOne_Throws_Async()
         {
-            Assert.Empty(await Items.ToPagerListAsync(1, 0));                 // 9.0 compatibility
-            Assert.Empty(await Items.AsQueryable().ToPagerListAsync(1, 0));
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => Items.ToPagerListAsync(1, 0));
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => Items.AsQueryable().ToPagerListAsync(1, 0));
             await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => Items.ToPagerListAsync(1, -1));
-            // New APIs require at least 1.
             await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => Items.AsQueryable().ToPagerListAsync(1, 0,
                 (q, _) => Task.FromResult(q.Count()), (q, _) => Task.FromResult(q.ToList())));
         }
@@ -97,7 +88,7 @@ namespace P.Pager.Tests
         public void Helper_EmptySource_DoesNotLinkToPageZero()
         {
             IPager<int> page = new List<int>().ToPagerList(1, 10);
-            string html = HtmlHelper.Pager(null!, page, p => "/items?page=" + p, PrePagerOptions.ClassicPagerWithFirstAndLastPages).ToString();
+            string html = HtmlHelper.Pager(null!, page, p => "/items?page=" + p, PrePagerOptions.ClassicPagerWithFirstAndLastPages).ToString()!;
             Assert.DoesNotContain("page=0", html);
             Assert.DoesNotContain("href", html);
         }
@@ -106,7 +97,7 @@ namespace P.Pager.Tests
         public void Helper_HrefIsNotEntityEncodedPerCharacter()
         {
             IPager<int> page = Items.ToPagerList(1, 20);
-            string html = HtmlHelper.Pager(null!, page, p => "/items?page=" + p).ToString();
+            string html = HtmlHelper.Pager(null!, page, p => "/items?page=" + p).ToString()!;
             Assert.Contains("href=\"/items?page=2\"", html);
         }
     }

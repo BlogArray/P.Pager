@@ -10,10 +10,10 @@ namespace P.Pager.Tests
             HtmlHelper.Pager(null!, pager, p => "/items?page=" + p, options ?? new PagerOptions()).ToString()!;
 
         [Fact]
-        public void Container_IsLabelledNavigationLandmark_AndKeeps90Class()
+        public void Container_IsLabelledNavigationLandmark()
         {
             string html = Render(Items.ToPagerList(1, 20));
-            Assert.StartsWith("<div aria-label=\"Pagination\" class=\"container\" role=\"navigation\">", html);
+            Assert.StartsWith("<div aria-label=\"Pagination\" class=\"pager\" role=\"navigation\">", html);
         }
 
         [Fact]
@@ -27,7 +27,7 @@ namespace P.Pager.Tests
         public void CurrentPage_HasAriaCurrent_AndNoHref()
         {
             string html = Render(Items.ToPagerList(3, 20));
-            Assert.Contains("<a aria-current=\"page\" class=\"page-link\">3</a>", html);
+            Assert.Contains("<a aria-current=\"page\" class=\"pager-link\">3</a>", html);
             Assert.DoesNotContain("href=\"/items?page=3\"", html);
         }
 
@@ -35,9 +35,9 @@ namespace P.Pager.Tests
         public void DisabledLinks_AreAriaDisabled_WithoutRel()
         {
             string html = Render(Items.ToPagerList(1, 20), PrePagerOptions.ClassicPagerWithFirstAndLastPages);
-            Assert.Contains("<a aria-disabled=\"true\" class=\"page-link\">&lt;</a>", html);
+            Assert.Contains("<a aria-disabled=\"true\" class=\"pager-link\">&lt;</a>", html);
             Assert.DoesNotContain("rel=\"prev\"", html);
-            Assert.Contains("<a class=\"page-link\" href=\"/items?page=2\" rel=\"next\">&gt;</a>", html);
+            Assert.Contains("<a class=\"pager-link\" href=\"/items?page=2\" rel=\"next\">&gt;</a>", html);
         }
 
         [Fact]

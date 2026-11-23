@@ -5,7 +5,7 @@ namespace P.Pager.Tests
         private static string RepoFile(string relative)
         {
             DirectoryInfo? dir = new(AppContext.BaseDirectory);
-            while (dir != null && !File.Exists(Path.Combine(dir.FullName, "P.Pager.sln")))
+            while (dir != null && !File.Exists(Path.Combine(dir.FullName, "P.Pager.slnx")))
                 dir = dir.Parent;
             Assert.NotNull(dir);
             return Path.Combine(dir!.FullName, relative);

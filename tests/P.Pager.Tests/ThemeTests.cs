@@ -12,9 +12,17 @@ namespace P.Pager.Tests
             P.Pager.Mvc.Core.HtmlHelper.Pager(null!, pager, p => "/x?page=" + p, options).ToString()!;
 
         [Fact]
-        public void MvcDefault_IsThe90Markup()
+        public void MvcDefault_IsNeutral()
         {
             string html = Render(Items.ToPagerList(3, 20), new PagerOptions { HasPagerText = true });
+            Assert.StartsWith("<div aria-label=\"Pagination\" class=\"pager\" role=\"navigation\"><ul class=\"pager-list\">", html);
+            Assert.Contains("<li class=\"pager-item is-disabled\"><span class=\"pager-link\">Page 3 of 10.</span></li>", html);
+        }
+
+        [Fact]
+        public void ClassicTheme_IsThe9xMarkup()
+        {
+            string html = Render(Items.ToPagerList(3, 20), new PagerOptions(PagerTheme.Classic) { HasPagerText = true });
             Assert.StartsWith("<div aria-label=\"Pagination\" class=\"container\" role=\"navigation\"><ul class=\"pagination\">", html);
             Assert.Contains("<li class=\"page-item active\"><a aria-current=\"page\" class=\"page-link\">3</a></li>", html);
             Assert.Contains("<li class=\"page-item disabled\"><a class=\"page-link\">Page 3 of 10.</a></li>", html); // text stays <a>
@@ -101,11 +109,11 @@ namespace P.Pager.Tests
     public class GlobalThemeTests
     {
         [Fact]
-        public void BuiltInDefault_IsClassicForMvc_NeutralForBlazor()
+        public void BuiltInDefault_IsNeutralForMvcAndBlazor()
         {
             Assert.False(PagerSettings.IsDefaultThemeSet);
-            Assert.Equal("container", PagerSettings.DefaultTheme.Container);
-            Assert.Equal("page-link", new PagerOptions().PageClass);
+            Assert.Equal("pager", PagerSettings.DefaultTheme.Container);
+            Assert.Equal("pager-link", new PagerOptions().PageClass);
 
             using BunitContext ctx = new();
             IRenderedComponent<Pagination> cut = ctx.Render<Pagination>(p => p.Add(x => x.Pager, Enumerable.Range(1, 50).ToPagerList(1, 10)));
@@ -116,12 +124,12 @@ namespace P.Pager.Tests
         [Fact]
         public void DefaultTheme_AppliesToNewOptions_OldPresets_AndBlazor()
         {
-            PagerSettings.DefaultTheme = PagerTheme.Neutral;
+            PagerSettings.DefaultTheme = PagerTheme.Classic;
             try
             {
                 Assert.True(PagerSettings.IsDefaultThemeSet);
-                Assert.Equal("pager-link", new PagerOptions().PageClass);
-                Assert.Equal("pager-link", PrePagerOptions.ClassicPager.PageClass);
+                Assert.Equal("page-link", new PagerOptions().PageClass);
+                Assert.Equal("page-link", PrePagerOptions.ClassicPager.PageClass);
 
                 PagerSettings.DefaultTheme = PagerTheme.Bootstrap;
                 using BunitContext ctx = new();
@@ -133,7 +141,7 @@ namespace P.Pager.Tests
                 PagerSettings.ResetDefaultTheme();
             }
             Assert.False(PagerSettings.IsDefaultThemeSet);
-            Assert.Equal("page-link", new PagerOptions().PageClass);
+            Assert.Equal("pager-link", new PagerOptions().PageClass);
         }
 
         [Fact]

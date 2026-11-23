@@ -10,11 +10,11 @@ using P.Pager.Mvc.Core;
 namespace P.Pager.Tests
 {
     /// <summary>
-    /// Guards backward compatibility with P.Pager 9.0.0: with default settings, every scenario must produce the same data and the
-    /// same HTML as the published package. HTML is compared as a browser sees it (entities decoded); purely additive
+    /// Guards the upgrade path from P.Pager 9.x: with <c>PagerSettings.DefaultTheme = PagerTheme.Classic</c>, every scenario must
+    /// produce the same data and the same HTML as the published 9.0.0 package. HTML is compared as a browser sees it (entities decoded); purely additive
     /// accessibility attributes (aria-*, role) and rel are ignored.
     /// </summary>
-    [Collection(nameof(PagerSettingsCollection))] // relies on the built-in default theme
+    [Collection(nameof(PagerSettingsCollection))] // changes the global default theme
     public class CompatibilityTests
     {
         public static IEnumerable<object[]> Expected90 =>
@@ -62,10 +62,17 @@ namespace P.Pager.Tests
 
         [Theory]
         [MemberData(nameof(Expected90))]
-        public void SameAs90(string scenario, string expected)
+        public void ClassicThemeSameAs90(string scenario, string expected)
         {
-            Assert.False(PagerSettings.IsDefaultThemeSet);
-            Assert.Equal(expected, Normalize(Render(scenario)));
+            PagerSettings.DefaultTheme = PagerTheme.Classic;
+            try
+            {
+                Assert.Equal(expected, Normalize(Render(scenario)));
+            }
+            finally
+            {
+                PagerSettings.ResetDefaultTheme();
+            }
         }
 
         private static string Normalize(string s) =>

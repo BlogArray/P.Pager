@@ -109,7 +109,7 @@ namespace P.Pager.Tests
             Assert.DoesNotContain("&gt;&gt;", html);       // no Last
 
             string last = P.Pager.Mvc.Core.HtmlHelper.SlicePager(null!, Items.ToSlice(3, 20), p => "/x?page=" + p, PrePagerOptions.Minimal).ToString()!;
-            Assert.Contains("<a aria-disabled=\"true\" class=\"page-link\">&gt;</a>", last);
+            Assert.Contains("<a aria-disabled=\"true\" class=\"pager-link\">&gt;</a>", last);
         }
     }
 
@@ -303,6 +303,7 @@ namespace P.Pager.Tests
         public void InvalidNames_Throw()
         {
             Assert.Throws<ArgumentException>(() => new SortMap<Row>().Add("-name", r => r.Name));
+            Assert.Throws<ArgumentException>(() => new SortMap<Row>().Add(" -name", r => r.Name)); // checked after trimming
             Assert.Throws<ArgumentException>(() => new SortMap<Row>().Add("a,b", r => r.Name));
             Assert.Throws<ArgumentException>(() => new SortMap<Row>().Add(" ", r => r.Name));
         }
