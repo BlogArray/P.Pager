@@ -2,12 +2,12 @@
   <!-- Shared settings (version, metadata, SourceLink, AOT, ...) are in ..\Directory.Build.props -->
   <!-- Razor SDK so the package can ship pager.css as a static web asset: ~/_content/P.Pager.Mvc.Core/pager.css -->
   <PropertyGroup>
-    <!-- net6.0/net7.0 stay for 9.x: 9.0.0 shipped them, so dropping them would stop .NET 6/7 apps from upgrading. Drop in 10.0. -->
-    <TargetFrameworks>net6.0;net7.0;net8.0;net9.0;net10.0</TargetFrameworks>
+    <!-- .NET 6 and 7 are out of support; apps on them stay on P.Pager.Mvc.Core 9.x. -->
+    <TargetFrameworks>net8.0;net9.0;net10.0;net11.0</TargetFrameworks>
     <Title>P.Pager.Mvc.Core</Title>
     <Description>Lightweight package for easily paging through any IEnumerable/IQueryable in .NET Core Mvc Web Application.</Description>
     <PackageTags>Paged list, paging in .net core, asp.net pagedlist, paging in .net, paging in mvc, MvcPager, MvcPagedList, PaginationInMvc, MvcPagination</PackageTags>
-    <PackageReleaseNotes>v9.1 - Backward compatible with 9.0. Supports .NET 6 and above. Same default markup as 9.0; opt-in themes (Neutral with pager.css, Bootstrap, Bulma, Tailwind, Foundation, UIkit, Materialize).</PackageReleaseNotes>
+    <PackageReleaseNotes>v10.0 - Major version: framework-neutral default theme (PagerTheme.Classic restores the 9.x markup), .NET 8 and above, Html.Pager returns IHtmlContent. See docs/version-history.md for the upgrade guide.</PackageReleaseNotes>
     <AssemblyOriginatorKeyFile>p.pager.mvc.core.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>

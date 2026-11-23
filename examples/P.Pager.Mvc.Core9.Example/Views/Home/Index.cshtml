@@ -42,7 +42,7 @@
 </table>
 
 <h3>Pager Configurations</h3>
-<h6>Default Pager Control <small>(PagerTheme.Classic: the same markup as 9.0)</small></h6>
+<h6>Default Pager Control <small>(PagerTheme.Neutral, styled by _content/P.Pager.Mvc.Core/pager.css)</small></h6>
 @Html.Pager((IPager)Model, page => Url.Action("Index", new { page }))
 
 <h6>Tag Helper <small>(links keep the current query string, e.g. ?sort=name)</small></h6>
@@ -52,8 +52,8 @@
 @Html.Pager((IPager)Model, PrePagerOptions.ClassicPager)
 
 <h3>Themes</h3>
-<h6>Neutral <small>(PrePagerOptions.Neutral, styled by _content/P.Pager.Mvc.Core/pager.css)</small></h6>
-@Html.Pager((IPager)Model, PrePagerOptions.Neutral)
+<h6>Classic <small>(new PagerOptions(PagerTheme.Classic): the 9.x markup)</small></h6>
+@Html.Pager((IPager)Model, new PagerOptions(PagerTheme.Classic))
 
 <h6>Bootstrap <small>(PrePagerOptions.Bootstrap, or PagerSettings.DefaultTheme = PagerTheme.Bootstrap for every pager)</small></h6>
 @Html.Pager((IPager)Model, PrePagerOptions.Bootstrap)

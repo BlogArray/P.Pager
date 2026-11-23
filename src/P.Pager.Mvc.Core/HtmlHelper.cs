@@ -21,7 +21,7 @@ namespace P.Pager.Mvc.Core
         /// <param name="pager">The Pager to use as the data source.</param>
         /// <param name="generatePageUrl">A function that takes the page number of the desired page and returns a URL-string that will load that page.</param>
         /// <returns>Outputs the pagination control HTML.</returns>
-        public static HtmlString Pager(this IHtmlHelper html, IPager pager, Func<int, string?> generatePageUrl)
+        public static IHtmlContent Pager(this IHtmlHelper html, IPager pager, Func<int, string?> generatePageUrl)
         {
             return Render(pager, generatePageUrl, new PagerOptions());
         }
@@ -34,7 +34,7 @@ namespace P.Pager.Mvc.Core
         /// <param name="generatePageUrl">A function that takes the page number of the desired page and returns a URL-string that will load that page.</param>
         /// <param name="pagerOptions">Formatting options.</param>
         /// <returns>Outputs the pagination control HTML.</returns>
-        public static HtmlString Pager(this IHtmlHelper html, IPager pager, Func<int, string?> generatePageUrl, PagerOptions pagerOptions)
+        public static IHtmlContent Pager(this IHtmlHelper html, IPager pager, Func<int, string?> generatePageUrl, PagerOptions pagerOptions)
         {
             return Render(pager, generatePageUrl, pagerOptions);
         }
@@ -48,7 +48,7 @@ namespace P.Pager.Mvc.Core
         /// <param name="pagerOptions">Formatting options. Default options when null.</param>
         /// <param name="pageParameterName">Name of the page query-string parameter. By default page.</param>
         /// <returns>Outputs the pagination control HTML.</returns>
-        public static HtmlString Pager(this IHtmlHelper html, IPager pager, PagerOptions? pagerOptions = null, string pageParameterName = "page")
+        public static IHtmlContent Pager(this IHtmlHelper html, IPager pager, PagerOptions? pagerOptions = null, string pageParameterName = "page")
         {
             return html == null
                 ? throw new ArgumentNullException(nameof(html))
@@ -65,7 +65,7 @@ namespace P.Pager.Mvc.Core
         /// <param name="pagerOptions">Formatting options. Default options when null.</param>
         /// <param name="pageParameterName">Name of the page query-string parameter used when <paramref name="generatePageUrl"/> is null. By default page.</param>
         /// <returns>Outputs the pagination control HTML.</returns>
-        public static HtmlString SlicePager(this IHtmlHelper html, ISlice slice, Func<int, string?>? generatePageUrl = null, PagerOptions? pagerOptions = null, string pageParameterName = "page")
+        public static IHtmlContent SlicePager(this IHtmlHelper html, ISlice slice, Func<int, string?>? generatePageUrl = null, PagerOptions? pagerOptions = null, string pageParameterName = "page")
         {
             if (generatePageUrl == null)
             {
@@ -90,9 +90,9 @@ namespace P.Pager.Mvc.Core
         /// </summary>
         private sealed class SliceAsPager(ISlice slice) : IPager
         {
-            public int CurrentPageIndex { get => slice.CurrentPageIndex; set => throw new NotSupportedException(); }
-            public int PageSize { get => slice.PageSize; set => throw new NotSupportedException(); }
-            public int TotalItemCount { get => slice.EndItemIndex; set => throw new NotSupportedException(); }
+            public int CurrentPageIndex => slice.CurrentPageIndex;
+            public int PageSize => slice.PageSize;
+            public int TotalItemCount => slice.EndItemIndex;
             public int TotalPageCount => slice.HasNextPage ? slice.CurrentPageIndex + 1 : slice.CurrentPageIndex;
             public bool HasPreviousPage => slice.HasPreviousPage;
             public bool HasNextPage => slice.HasNextPage;

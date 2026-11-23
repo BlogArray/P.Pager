@@ -5,10 +5,10 @@ namespace P.Pager
     /// P.Pager.Blazor (<c>&lt;Pagination Theme="..." /&gt;</c>), so one theme works everywhere.
     /// </summary>
     /// <remarks>
-    /// <see cref="Classic"/> is the markup of P.Pager 9.0 and earlier and stays the MVC default in 9.x, so upgrading changes nothing.
-    /// <see cref="Neutral"/> uses framework-neutral class names styled by the optional <c>pager.css</c> shipped in the UI packages
+    /// <see cref="Neutral"/> (the default) uses framework-neutral class names styled by the optional <c>pager.css</c> shipped in the UI packages
     /// (<c>_content/P.Pager.Mvc.Core/pager.css</c> or <c>_content/P.Pager.Blazor/pager.css</c>).
-    /// Set <see cref="PagerSettings.DefaultTheme"/> once at startup to use another theme everywhere.
+    /// Set <see cref="PagerSettings.DefaultTheme"/> once at startup to use another theme everywhere, for example
+    /// <see cref="Classic"/> to keep the markup of P.Pager 9.x.
     /// </remarks>
     public sealed class PagerTheme
     {
@@ -43,8 +43,8 @@ namespace P.Pager
         public string TextElement { get; set; } = "span";
 
         /// <summary>
-        /// The exact markup of P.Pager 9.0 and earlier: Bootstrap classes inside <c>&lt;div class="container"&gt;</c>, with text
-        /// items rendered as <c>&lt;a&gt;</c>. This is the MVC default in 9.x so existing apps don't change.
+        /// The exact markup of P.Pager 9.x and earlier: Bootstrap classes inside <c>&lt;div class="container"&gt;</c>, with text
+        /// items rendered as <c>&lt;a&gt;</c>. Set <c>PagerSettings.DefaultTheme = PagerTheme.Classic</c> to keep it after upgrading.
         /// New apps should prefer <see cref="Bootstrap"/> (no <c>container</c> class, which clashes with Bootstrap's layout) or <see cref="Neutral"/>.
         /// </summary>
         public static PagerTheme Classic => new()
@@ -60,7 +60,7 @@ namespace P.Pager
 
         /// <summary>
         /// Framework-neutral classes (<c>pager</c>, <c>pager-list</c>, <c>pager-item</c>, <c>pager-link</c>, <c>is-active</c>, <c>is-disabled</c>),
-        /// styled by the optional <c>pager.css</c>. The default of P.Pager.Blazor.
+        /// styled by the optional <c>pager.css</c>. The default.
         /// </summary>
         public static PagerTheme Neutral => new()
         {

@@ -35,21 +35,19 @@ namespace P.Pager
         /// <summary>
         /// The theme (CSS class names) used by new <c>PagerOptions</c>, and by the Blazor <c>Pagination</c> component once set.
         /// Set it once at startup, for example <c>PagerSettings.DefaultTheme = PagerTheme.Neutral;</c> or <c>PagerTheme.Bootstrap</c>.
-        /// Default: <see cref="PagerTheme.Classic"/>, the markup of P.Pager 9.0, so upgrading changes nothing.
+        /// Default: <see cref="PagerTheme.Neutral"/> (framework-neutral, styled by <c>pager.css</c>).
+        /// Use <see cref="PagerTheme.Classic"/> to keep the markup of P.Pager 9.x.
         /// </summary>
         public static PagerTheme DefaultTheme
         {
-            get => _defaultTheme ?? PagerTheme.Classic;
+            get => _defaultTheme ?? PagerTheme.Neutral;
             set => _defaultTheme = value ?? throw new ArgumentNullException(nameof(value));
         }
 
-        /// <summary>
-        /// True once <see cref="DefaultTheme"/> has been assigned. Components without legacy markup (P.Pager.Blazor) use
-        /// <see cref="PagerTheme.Neutral"/> until an app chooses a default theme.
-        /// </summary>
+        /// <summary>True once <see cref="DefaultTheme"/> has been assigned by the app.</summary>
         public static bool IsDefaultThemeSet => _defaultTheme != null;
 
-        /// <summary>Restores the built-in default (<see cref="PagerTheme.Classic"/>). Mainly for tests.</summary>
+        /// <summary>Restores the built-in default (<see cref="PagerTheme.Neutral"/>). Mainly for tests.</summary>
         public static void ResetDefaultTheme() => _defaultTheme = null;
     }
 }

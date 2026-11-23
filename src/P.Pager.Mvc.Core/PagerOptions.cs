@@ -157,27 +157,27 @@ namespace P.Pager.Mvc.Core
         public string TextToLastPage { get; set; }
 
         /// <summary>
-        /// Css class to append to &lt;div&gt; element wrapping the pager, by default it is set to container (from PagerSettings.DefaultTheme, PagerTheme.Classic).
+        /// Css class to append to &lt;div&gt; element wrapping the pager, by default it is set to pager (from PagerSettings.DefaultTheme).
         /// </summary>
         public string? ClassToPagerContainer { get; set; }
 
         /// <summary>
-        /// Css class to append to &lt;ul&gt; element in the paging content, by default it is set to pagination (from PagerSettings.DefaultTheme).
+        /// Css class to append to &lt;ul&gt; element in the paging content, by default it is set to pager-list (from PagerSettings.DefaultTheme).
         /// </summary>
         public string? ClassToUl { get; set; }
 
         /// <summary>
-        /// Css class to append to &lt;li&gt; element in the paging content, by default it is set to page-item (from PagerSettings.DefaultTheme).
+        /// Css class to append to &lt;li&gt; element in the paging content, by default it is set to pager-item (from PagerSettings.DefaultTheme).
         /// </summary>
         public string? ClassToLi { get; set; }
 
         /// <summary>
-        /// Css class to append to &lt;a&gt;/&lt;span&gt; element in the paging content, by default it is set to page-link (from PagerSettings.DefaultTheme).
+        /// Css class to append to &lt;a&gt;/&lt;span&gt; element in the paging content, by default it is set to pager-link (from PagerSettings.DefaultTheme).
         /// </summary>
         public string? PageClass { get; set; }
 
         /// <summary>
-        /// Css class to append to &lt;li&gt; element if active in the paging content, by default it is set to active (from PagerSettings.DefaultTheme).
+        /// Css class to append to &lt;li&gt; element if active in the paging content, by default it is set to is-active (from PagerSettings.DefaultTheme).
         /// </summary>
         public string? ClassToActiveLi { get; set; }
 
@@ -225,7 +225,7 @@ namespace P.Pager.Mvc.Core
         public string? ClassToActiveLink { get; set; }
 
         /// <summary>
-        /// Css class to append to &lt;li&gt; elements that are disabled (unavailable first/previous/next/last links, pager text, ellipses), by default it is set to disabled (from PagerSettings.DefaultTheme).
+        /// Css class to append to &lt;li&gt; elements that are disabled (unavailable first/previous/next/last links, pager text, ellipses), by default it is set to is-disabled (from PagerSettings.DefaultTheme).
         /// </summary>
         public string? ClassToDisabledLi { get; set; }
 
@@ -246,10 +246,10 @@ namespace P.Pager.Mvc.Core
         public IStringLocalizer? Localizer { get; set; }
 
         /// <summary>
-        /// Element used for text that is not a link (pager text, entries text, ellipses): <c>a</c> (the markup of P.Pager 9.0, used by
-        /// <see cref="PagerTheme.Classic"/>) or <c>span</c>. Set by the theme.
+        /// Element used for text that is not a link (pager text, entries text, ellipses): <c>span</c>, or <c>a</c> without href
+        /// (the markup of P.Pager 9.x, used by <see cref="PagerTheme.Classic"/>). Set by the theme.
         /// </summary>
-        public string TextElement { get; set; } = "a";
+        public string TextElement { get; set; } = "span";
 
     }
 

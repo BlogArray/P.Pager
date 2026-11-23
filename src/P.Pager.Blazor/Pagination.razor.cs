@@ -63,8 +63,8 @@ namespace P.Pager.Blazor
 
         /// <summary>
         /// The CSS class names to render with, for example <see cref="PagerTheme.Bootstrap"/>. When null,
-        /// <see cref="PagerSettings.DefaultTheme"/> is used if the app set it, otherwise <see cref="PagerTheme.Neutral"/>
-        /// (framework-neutral classes styled by <c>_content/P.Pager.Blazor/pager.css</c>).
+        /// <see cref="PagerSettings.DefaultTheme"/> is used (by default <see cref="PagerTheme.Neutral"/>: framework-neutral
+        /// classes styled by <c>_content/P.Pager.Blazor/pager.css</c>).
         /// The *Class parameters below override single classes of the theme.
         /// </summary>
         [Parameter] public PagerTheme? Theme { get; set; }
@@ -93,8 +93,7 @@ namespace P.Pager.Blazor
         /// <summary>Css class added to disabled links. Overrides the theme.</summary>
         [Parameter] public string? DisabledLinkClass { get; set; }
 
-        // A new component has no legacy markup to keep: Neutral unless the app chose a theme.
-        private PagerTheme EffectiveTheme => Theme ?? (PagerSettings.IsDefaultThemeSet ? PagerSettings.DefaultTheme : PagerTheme.Neutral);
+        private PagerTheme EffectiveTheme => Theme ?? PagerSettings.DefaultTheme;
         private string? CssContainer => ContainerClass ?? EffectiveTheme.Container;
         private string? CssList => ListClass ?? EffectiveTheme.List;
         private string? CssItem => ItemClass ?? EffectiveTheme.Item;
@@ -127,9 +126,9 @@ namespace P.Pager.Blazor
         /// <summary>A slice seen as a pager whose last known page is the next one. Only First/Previous/Next use it.</summary>
         private sealed class SliceView(ISlice slice) : IPager
         {
-            public int CurrentPageIndex { get => slice.CurrentPageIndex; set => throw new NotSupportedException(); }
-            public int PageSize { get => slice.PageSize; set => throw new NotSupportedException(); }
-            public int TotalItemCount { get => slice.EndItemIndex; set => throw new NotSupportedException(); }
+            public int CurrentPageIndex => slice.CurrentPageIndex;
+            public int PageSize => slice.PageSize;
+            public int TotalItemCount => slice.EndItemIndex;
             public int TotalPageCount => slice.HasNextPage ? slice.CurrentPageIndex + 1 : slice.CurrentPageIndex;
             public bool HasPreviousPage => slice.HasPreviousPage;
             public bool HasNextPage => slice.HasNextPage;
