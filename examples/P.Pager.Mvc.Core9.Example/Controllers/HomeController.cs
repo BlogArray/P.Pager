@@ -1,16 +1,16 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using P.Pager.Mvc.Core9.Example.Models;
 using System.Diagnostics;
 
 namespace P.Pager.Mvc.Core9.Example.Controllers
 {
-    public class HomeController(ILogger<HomeController> logger) : Controller
+    public class HomeController : Controller
     {
-        DemoData _data = new DemoData();
+        DemoData _data = new();
 
         public IActionResult Index(int page = 1)
         {
-            var pager = _data.GetMembers().ToPagerList(page, 2);
+            IPager<Member> pager = _data.GetMembers().ToPagerList(page, 2);
             return View(pager);
         }
 
