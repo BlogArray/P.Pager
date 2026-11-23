@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <!-- Shared settings (version, metadata, SourceLink, AOT, ...) are in ..\Directory.Build.props -->
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <Title>P.Pager.Blazor</Title>
+    <Description>Blazor pagination component for P.Pager. Works with Blazor Server, WebAssembly and static SSR.</Description>
+    <PackageTags>Blazor, pagination, pager, paging, paged list, P.Pager</PackageTags>
+    <PackageReleaseNotes>v9.1 - First release: Pagination component for Blazor (.NET 8 and above).</PackageReleaseNotes>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Signed with the same key as P.Pager so strong-named apps can reference it. -->
+    <AssemblyOriginatorKeyFile>..\P.Pager\p.pager.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.10" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.0" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\P.Pager\P.Pager.csproj" />
+  </ItemGroup>
+</Project>
