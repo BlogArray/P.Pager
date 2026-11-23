@@ -302,7 +302,7 @@ namespace P.Pager
             List<T> items = await toListAsync(allItems.Skip(itemIndex).Take(pageSize), cancellationToken).ConfigureAwait(false);
             return new PagerAsync<T>(items, pageIndex, pageSize, totalItemCount);
         }
-    
+
         /// <summary>
         /// Pages a query when the total number of items is already known (for example cached), so no COUNT query is run.
         /// </summary>

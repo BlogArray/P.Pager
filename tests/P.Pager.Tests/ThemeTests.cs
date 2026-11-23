@@ -23,7 +23,7 @@ namespace P.Pager.Tests
         [Fact]
         public void Neutral_IsFrameworkNeutral_WithSpans()
         {
-            var options = new PagerOptions(PagerTheme.Neutral) { HasPagerText = true, HasEntriesText = true, PagesToDisplay = 3 };
+            PagerOptions options = new(PagerTheme.Neutral) { HasPagerText = true, HasEntriesText = true, PagesToDisplay = 3 };
             string html = Render(Items.ToPagerList(5, 20), options);
             Assert.StartsWith("<div aria-label=\"Pagination\" class=\"pager\" role=\"navigation\"><ul class=\"pager-list\">", html);
             Assert.Contains("<li class=\"pager-item is-active\"><a aria-current=\"page\" class=\"pager-link\">5</a></li>", html);
@@ -83,7 +83,7 @@ namespace P.Pager.Tests
         [Fact]
         public void BlazorTheme_Parameter()
         {
-            using var ctx = new BunitContext();
+            using BunitContext ctx = new();
             IRenderedComponent<Pagination> cut = ctx.Render<Pagination>(p => p
                 .Add(x => x.Pager, Items.ToPagerList(1, 20))
                 .Add(x => x.Theme, PagerTheme.Bootstrap)
@@ -107,7 +107,7 @@ namespace P.Pager.Tests
             Assert.Equal("container", PagerSettings.DefaultTheme.Container);
             Assert.Equal("page-link", new PagerOptions().PageClass);
 
-            using var ctx = new BunitContext();
+            using BunitContext ctx = new();
             IRenderedComponent<Pagination> cut = ctx.Render<Pagination>(p => p.Add(x => x.Pager, Enumerable.Range(1, 50).ToPagerList(1, 10)));
             Assert.Equal("pager", cut.Find("nav").GetAttribute("class"));
             Assert.Equal("pager-item is-active", cut.Find("[aria-current=page]").ParentElement!.GetAttribute("class"));
@@ -124,7 +124,7 @@ namespace P.Pager.Tests
                 Assert.Equal("pager-link", PrePagerOptions.ClassicPager.PageClass);
 
                 PagerSettings.DefaultTheme = PagerTheme.Bootstrap;
-                using var ctx = new BunitContext();
+                using BunitContext ctx = new();
                 IRenderedComponent<Pagination> cut = ctx.Render<Pagination>(p => p.Add(x => x.Pager, Enumerable.Range(1, 50).ToPagerList(1, 10)));
                 Assert.Equal("pagination", cut.Find("ul").GetAttribute("class"));
             }

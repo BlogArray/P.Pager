@@ -91,7 +91,7 @@ namespace P.Pager
 
         private IQueryable<T> ApplyFields(IQueryable<T> query, string sort, ref bool applied)
         {
-            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            HashSet<string> seen = new(StringComparer.OrdinalIgnoreCase);
             foreach (string raw in sort.Split(','))
             {
                 if (seen.Count >= MaxFields)
@@ -100,9 +100,9 @@ namespace P.Pager
                 string part = raw.Trim();
                 bool descending = part.StartsWith("-", StringComparison.Ordinal);
                 if (descending || part.StartsWith("+", StringComparison.Ordinal))
-                    part = part.Substring(1).Trim();
+                    part = part[1..].Trim();
 
-                if (part.Length == 0 || !seen.Add(part) || !_fields.TryGetValue(part, out var apply))
+                if (part.Length == 0 || !seen.Add(part) || !_fields.TryGetValue(part, out Func<IQueryable<T>, bool, bool, IQueryable<T>>? apply))
                     continue; // unknown or repeated fields are ignored
 
                 query = apply(query, !applied, descending);
@@ -133,9 +133,9 @@ namespace P.Pager
         /// <returns>The sorted query.</returns>
         public static IQueryable<T> ApplySort<T>(this IQueryable<T> source, string? sort, SortMap<T> sortMap)
         {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            if (sortMap == null) throw new ArgumentNullException(nameof(sortMap));
-            return sortMap.Apply(source, sort);
+            return source == null
+                ? throw new ArgumentNullException(nameof(source))
+                : sortMap == null ? throw new ArgumentNullException(nameof(sortMap)) : sortMap.Apply(source, sort);
         }
     }
 }

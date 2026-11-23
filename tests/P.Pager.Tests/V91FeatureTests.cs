@@ -1,5 +1,4 @@
 using Bunit;
-using Microsoft.AspNetCore.Http;
 using P.Pager.Blazor;
 using P.Pager.Mvc.Core;
 
@@ -99,7 +98,7 @@ namespace P.Pager.Tests
         [Fact]
         public void HtmlHelper_SlicePager_ShowsFirstPreviousNextOnly()
         {
-            var options = new PagerOptions { DisplayFirstPage = PagerDisplayMode.Always, HasPagerText = true, HasEntriesText = true };
+            PagerOptions options = new() { DisplayFirstPage = PagerDisplayMode.Always, HasPagerText = true, HasEntriesText = true };
             string html = P.Pager.Mvc.Core.HtmlHelper.SlicePager(null!, Items.ToSlice(2, 20), p => "/x?page=" + p, options).ToString()!;
 
             Assert.Contains("href=\"/x?page=1\" rel=\"prev\"", html);
@@ -134,7 +133,7 @@ namespace P.Pager.Tests
         [Fact]
         public void ToPagerList_WithKnownTotal_DoesNotCount()
         {
-            var source = new CountingQueryable(Enumerable.Range(1, 45));
+            CountingQueryable source = new(Enumerable.Range(1, 45));
             IPager<int> page = source.ToPagerList(3, 20, totalItemCount: 45);
             Assert.Equal(Enumerable.Range(41, 5), page);
             Assert.Equal(0, source.CountCalls);
@@ -191,7 +190,7 @@ namespace P.Pager.Tests
         [InlineData(3, 5000, 3, 100)]
         public void Defaults_AndClamping(int? page, int? size, int expectedPage, int expectedSize)
         {
-            var request = new PageRequest { Page = page, PageSize = size };
+            PageRequest request = new() { Page = page, PageSize = size };
             Assert.Equal(expectedPage, request.GetPageIndex());
             Assert.Equal(expectedSize, request.GetPageSize());
         }
@@ -199,7 +198,7 @@ namespace P.Pager.Tests
         [Fact]
         public void CustomDefaults()
         {
-            var request = new PageRequest { PageSize = 500 };
+            PageRequest request = new() { PageSize = 500 };
             Assert.Equal(50, request.GetPageSize(defaultPageSize: 20, maxPageSize: 50));
             Assert.Equal(20, new PageRequest().GetPageSize(defaultPageSize: 20, maxPageSize: 50));
         }
@@ -207,7 +206,7 @@ namespace P.Pager.Tests
         [Fact]
         public void ToPagerList_UsesRequest()
         {
-            var request = new PageRequest { Page = 2, PageSize = 1000 };
+            PageRequest request = new() { Page = 2, PageSize = 1000 };
             IPager<int> page = Enumerable.Range(1, 250).AsQueryable().ToPagerList(request);
             Assert.Equal(100, page.PageSize);
             Assert.Equal(Enumerable.Range(101, 100), page);
@@ -218,7 +217,7 @@ namespace P.Pager.Tests
         [Fact]
         public async Task ToPagerListAsync_And_ToSlice_UseRequest()
         {
-            var request = new PageRequest { Page = 3, PageSize = 20 };
+            PageRequest request = new() { Page = 3, PageSize = 20 };
             IQueryable<int> q = Enumerable.Range(1, 45).AsQueryable();
             IPager<int> page = await q.ToPagerListAsync(request, (x, _) => Task.FromResult(x.Count()), (x, _) => Task.FromResult(x.ToList()));
             Assert.Equal(Enumerable.Range(41, 5), page);
@@ -288,7 +287,7 @@ namespace P.Pager.Tests
         [Fact]
         public void RepeatedFields_AndMaxFields()
         {
-            var map = new SortMap<Row> { MaxFields = 1 }.Add("name", r => r.Name).Add("created", r => r.Created).ThenBy(r => r.Id);
+            SortMap<Row> map = new SortMap<Row> { MaxFields = 1 }.Add("name", r => r.Name).Add("created", r => r.Created).ThenBy(r => r.Id);
             Assert.Equal(new[] { 2, 1, 3, 4 }, Ids("name,-created", map)); // second field ignored
             Assert.Equal(new[] { 2, 1, 3, 4 }, Ids("name,-name", map));
         }
@@ -296,7 +295,7 @@ namespace P.Pager.Tests
         [Fact]
         public void NoSortNoDefault_TiebreakerOnly()
         {
-            var map = new SortMap<Row>().Add("name", r => r.Name).ThenBy(r => r.Id, descending: true);
+            SortMap<Row> map = new SortMap<Row>().Add("name", r => r.Name).ThenBy(r => r.Id, descending: true);
             Assert.Equal(new[] { 4, 3, 2, 1 }, Ids(null, map));
         }
 

@@ -77,9 +77,11 @@ namespace P.Pager.Mvc.Core
 
         internal static HtmlString RenderSlice(ISlice slice, Func<int, string?> generatePageUrl, PagerOptions pagerOptions)
         {
-            if (slice == null) throw new ArgumentNullException(nameof(slice));
-            if (pagerOptions == null) throw new ArgumentNullException(nameof(pagerOptions));
-            return Render(new SliceAsPager(slice), generatePageUrl, pagerOptions.ForSlice());
+            return slice == null
+                ? throw new ArgumentNullException(nameof(slice))
+                : pagerOptions == null
+                ? throw new ArgumentNullException(nameof(pagerOptions))
+                : Render(new SliceAsPager(slice), generatePageUrl, pagerOptions.ForSlice());
         }
 
         /// <summary>

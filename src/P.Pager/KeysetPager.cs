@@ -136,7 +136,7 @@ namespace P.Pager
                 Items = items,
                 PageSize = pageSize,
                 HasNextPage = hasNext,
-                NextKey = items.Count > 0 ? keySelector.Compile()(items[items.Count - 1]) : default,
+                NextKey = items.Count > 0 ? keySelector.Compile()(items[^1]) : default,
             };
         }
 

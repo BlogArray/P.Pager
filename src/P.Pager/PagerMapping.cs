@@ -25,9 +25,11 @@ namespace P.Pager
         /// <returns>A page with the converted items and the same metadata.</returns>
         public static IPager<TResult> Map<TSource, TResult>(this IPager<TSource> pager, Func<TSource, TResult> selector)
         {
-            if (pager == null) throw new ArgumentNullException(nameof(pager));
-            if (selector == null) throw new ArgumentNullException(nameof(selector));
-            return new PagerAsync<TResult>(pager.Select(selector), pager.CurrentPageIndex, pager.PageSize, pager.TotalItemCount);
+            return pager == null
+                ? throw new ArgumentNullException(nameof(pager))
+                : selector == null
+                ? throw new ArgumentNullException(nameof(selector))
+                : (IPager<TResult>)new PagerAsync<TResult>(pager.Select(selector), pager.CurrentPageIndex, pager.PageSize, pager.TotalItemCount);
         }
 
         /// <summary>
@@ -40,9 +42,11 @@ namespace P.Pager
         /// <returns>A page with the converted items and the same metadata.</returns>
         public static ISlice<TResult> Map<TSource, TResult>(this ISlice<TSource> slice, Func<TSource, TResult> selector)
         {
-            if (slice == null) throw new ArgumentNullException(nameof(slice));
-            if (selector == null) throw new ArgumentNullException(nameof(selector));
-            return new Slice<TResult>(slice.Select(selector).ToList(), slice.CurrentPageIndex, slice.PageSize, slice.HasNextPage);
+            return slice == null
+                ? throw new ArgumentNullException(nameof(slice))
+                : selector == null
+                ? throw new ArgumentNullException(nameof(selector))
+                : (ISlice<TResult>)new Slice<TResult>(slice.Select(selector).ToList(), slice.CurrentPageIndex, slice.PageSize, slice.HasNextPage);
         }
     }
 }

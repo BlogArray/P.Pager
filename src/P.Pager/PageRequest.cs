@@ -62,8 +62,9 @@ namespace P.Pager
         public static IPager<T> ToPagerList<T>(this IQueryable<T> source, PageRequest request,
             int defaultPageSize = PageRequest.DefaultPageSize, int maxPageSize = PageRequest.DefaultMaxPageSize)
         {
-            if (request == null) throw new ArgumentNullException(nameof(request));
-            return source.ToPagerList(request.GetPageIndex(), request.GetPageSize(defaultPageSize, maxPageSize));
+            return request == null
+                ? throw new ArgumentNullException(nameof(request))
+                : source.ToPagerList(request.GetPageIndex(), request.GetPageSize(defaultPageSize, maxPageSize));
         }
 
         /// <summary>Pages an in-memory sequence using the request's page and a safe page size.</summary>
@@ -76,8 +77,9 @@ namespace P.Pager
         public static IPager<T> ToPagerList<T>(this IEnumerable<T> source, PageRequest request,
             int defaultPageSize = PageRequest.DefaultPageSize, int maxPageSize = PageRequest.DefaultMaxPageSize)
         {
-            if (request == null) throw new ArgumentNullException(nameof(request));
-            return source.ToPagerList(request.GetPageIndex(), request.GetPageSize(defaultPageSize, maxPageSize));
+            return request == null
+                ? throw new ArgumentNullException(nameof(request))
+                : source.ToPagerList(request.GetPageIndex(), request.GetPageSize(defaultPageSize, maxPageSize));
         }
 
         /// <summary>Asynchronously pages the query using the request's page and a safe page size, with the provider's async operators.</summary>
@@ -96,8 +98,9 @@ namespace P.Pager
             int defaultPageSize = PageRequest.DefaultPageSize, int maxPageSize = PageRequest.DefaultMaxPageSize,
             CancellationToken cancellationToken = default)
         {
-            if (request == null) throw new ArgumentNullException(nameof(request));
-            return source.ToPagerListAsync(request.GetPageIndex(), request.GetPageSize(defaultPageSize, maxPageSize), countAsync, toListAsync, cancellationToken);
+            return request == null
+                ? throw new ArgumentNullException(nameof(request))
+                : source.ToPagerListAsync(request.GetPageIndex(), request.GetPageSize(defaultPageSize, maxPageSize), countAsync, toListAsync, cancellationToken);
         }
 
         /// <summary>Returns the requested page without counting the total. See <see cref="SliceExtension.ToSlice{T}(IQueryable{T}, int, int)"/>.</summary>
@@ -110,8 +113,9 @@ namespace P.Pager
         public static ISlice<T> ToSlice<T>(this IQueryable<T> source, PageRequest request,
             int defaultPageSize = PageRequest.DefaultPageSize, int maxPageSize = PageRequest.DefaultMaxPageSize)
         {
-            if (request == null) throw new ArgumentNullException(nameof(request));
-            return source.ToSlice(request.GetPageIndex(), request.GetPageSize(defaultPageSize, maxPageSize));
+            return request == null
+                ? throw new ArgumentNullException(nameof(request))
+                : source.ToSlice(request.GetPageIndex(), request.GetPageSize(defaultPageSize, maxPageSize));
         }
     }
 }

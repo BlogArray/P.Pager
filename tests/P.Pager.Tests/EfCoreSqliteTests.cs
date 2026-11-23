@@ -68,7 +68,7 @@ namespace P.Pager.Tests
         [Fact]
         public async Task ToPagerListAsync_WithEfCoreOperators()
         {
-            using var cts = new CancellationTokenSource();
+            using CancellationTokenSource cts = new();
             IPager<Member> page = await _db.Members.OrderBy(m => m.Id).ToPagerListAsync(2, 20,
                 (q, ct) => q.CountAsync(ct),
                 (q, ct) => EntityFrameworkQueryableExtensions.ToListAsync(q, ct),
@@ -203,7 +203,7 @@ namespace P.Pager.Tests
         [Fact]
         public async Task PageRequest_WithEfCoreAsync_AndMap()
         {
-            var request = new PageRequest { Page = 2, PageSize = 500, Sort = "name" };
+            PageRequest request = new() { Page = 2, PageSize = 500, Sort = "name" };
             IPager<string> names = (await _db.Members.ApplySort(request.Sort, MemberSorts).ToPagerListAsync(request,
                     (q, ct) => q.CountAsync(ct),
                     (q, ct) => EntityFrameworkQueryableExtensions.ToListAsync(q, ct),
