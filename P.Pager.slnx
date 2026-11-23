@@ -1,0 +1,35 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/docs/">
+    <File Path="docs/version-history.md" />
+  </Folder>
+  <Folder Name="/examples/">
+    <Project Path="examples/P.Pager.Mvc.Core9.Example/P.Pager.Mvc.Core9.Example.csproj" />
+  </Folder>
+  <Folder Name="/img/">
+    <File Path="icon.png" />
+    <File Path="img/1.default.PNG" />
+    <File Path="img/10.CustomOptions.PNG" />
+    <File Path="img/11.Using Icons.PNG" />
+    <File Path="img/2. minimal.PNG" />
+    <File Path="img/3.minimalpagecount.PNG" />
+    <File Path="img/4.minimalwithentries.PNG" />
+    <File Path="img/5.classic.PNG" />
+    <File Path="img/6.classiclastfirst.PNG" />
+    <File Path="img/7.custompagenumbers.PNG" />
+    <File Path="img/8.CustomPageText.PNG" />
+    <File Path="img/9.CustomWording.PNG" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/P.Pager.Blazor/P.Pager.Blazor.csproj" />
+    <Project Path="src/P.Pager.Mvc.Core/P.Pager.Mvc.Core.csproj" />
+    <Project Path="src/P.Pager/P.Pager.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/P.Pager.Tests/P.Pager.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -14,22 +14,23 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0   # full history for SourceLink / deterministic builds
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: |
             8.0.x
             9.0.x
             10.0.x
+            11.0.x
 
       - name: Restore
-        run: dotnet restore P.Pager.sln
+        run: dotnet restore P.Pager.slnx
 
       - name: Build
-        run: dotnet build P.Pager.sln -c Release --no-restore -p:GeneratePackageOnBuild=false
+        run: dotnet build P.Pager.slnx -c Release --no-restore -p:GeneratePackageOnBuild=false
 
       - name: Test
         run: dotnet test tests/P.Pager.Tests/P.Pager.Tests.csproj -c Release --no-build --logger "trx"
@@ -40,7 +41,7 @@ jobs:
           dotnet pack src/P.Pager.Mvc.Core/P.Pager.Mvc.Core.csproj -c Release --no-build -o artifacts
           dotnet pack src/P.Pager.Blazor/P.Pager.Blazor.csproj -c Release --no-build -o artifacts
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: nuget-packages
           path: artifacts/*
@@ -53,11 +54,11 @@ jobs:
     runs-on: ubuntu-latest
     environment: nuget
     steps:
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: 11.0.x
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: nuget-packages
           path: artifacts

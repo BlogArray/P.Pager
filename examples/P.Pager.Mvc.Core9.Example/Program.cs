@@ -1,7 +1,7 @@
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
+builder.Services.AddControllersWithViews(); // edit views with Hot Reload (dotnet watch)
 
 WebApplication app = builder.Build();
 
