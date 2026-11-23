@@ -1,0 +1,6 @@
+# P.Pager targets netstandard2.0, which has no System.Index / System.Range.
+# Stop IDE code cleanup from rewriting items[items.Count - 1] to items[^1] or Substring(1) to [1..]:
+# those compile for net8.0+ but break the netstandard2.0 build.
+[*.cs]
+csharp_style_prefer_index_operator = false
+csharp_style_prefer_range_operator = false

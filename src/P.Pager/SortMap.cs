@@ -100,7 +100,7 @@ namespace P.Pager
                 string part = raw.Trim();
                 bool descending = part.StartsWith("-", StringComparison.Ordinal);
                 if (descending || part.StartsWith("+", StringComparison.Ordinal))
-                    part = part[1..].Trim();
+                    part = part.Substring(1).Trim();
 
                 if (part.Length == 0 || !seen.Add(part) || !_fields.TryGetValue(part, out Func<IQueryable<T>, bool, bool, IQueryable<T>>? apply))
                     continue; // unknown or repeated fields are ignored
