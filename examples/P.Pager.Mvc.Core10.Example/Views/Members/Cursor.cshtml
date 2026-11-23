@@ -1,0 +1,68 @@
+@model CursorViewModel
+@{
+    ViewData["Title"] = "Cursor (keyset)";
+    bool isFirstPage = Model.PreviousBefore is null;
+}
+
+<h1>Cursor (keyset)</h1>
+
+<p>
+    <code>ToKeysetPage</code> seeks to the rows after a key (<code>WHERE Id &gt; @@after ORDER BY Id</code>) instead of
+    skipping rows, so page 1,000 is as fast as page 1, and rows added or deleted meanwhile don't shift the pages.
+    There is no count and no page numbers: the URL carries a cursor, <code>?after=</code> for Next and
+    <code>?before=</code> for Previous (the rows before the key, read in descending order and flipped).
+</p>
+
+@if (Model.Members.Count == 0)
+{
+    <p class="alert alert-info">No more members. <a asp-action="Cursor" asp-route-pageSize="@Model.PageSize">Back to the first page</a>.</p>
+}
+else
+{
+    <p class="text-muted">Members #@Model.Members[0].Id to #@Model.Members[^1].Id.</p>
+    <partial name="_MemberTable" model="Model.Members" />
+}
+
+@* No helper is needed: the cursor links use the same neutral classes as the pager, so pager.css styles them. *@
+<nav class="pager" aria-label="Pagination">
+    <ul class="pager-list">
+        <li class="pager-item @(isFirstPage ? "is-disabled" : null)">
+            @if (isFirstPage)
+            {
+                <span class="pager-link">First</span>
+            }
+            else
+            {
+                <a class="pager-link" asp-action="Cursor" asp-route-pageSize="@Model.PageSize">First</a>
+            }
+        </li>
+        <li class="pager-item @(isFirstPage ? "is-disabled" : null)">
+            @if (isFirstPage)
+            {
+                <span class="pager-link">‹ Previous</span>
+            }
+            else
+            {
+                <a class="pager-link" rel="prev" asp-action="Cursor" asp-route-before="@Model.PreviousBefore" asp-route-pageSize="@Model.PageSize">‹ Previous</a>
+            }
+        </li>
+        <li class="pager-item @(Model.NextAfter is null ? "is-disabled" : null)">
+            @if (Model.NextAfter is null)
+            {
+                <span class="pager-link">Next ›</span>
+            }
+            else
+            {
+                <a class="pager-link" rel="next" asp-action="Cursor" asp-route-after="@Model.NextAfter" asp-route-pageSize="@Model.PageSize">Next ›</a>
+            }
+        </li>
+    </ul>
+</nav>
+
+<p class="mt-3">
+    Page size:
+    @foreach (int size in new[] { 10, 20, 50 })
+    {
+        <a class="me-2" asp-action="Cursor" asp-route-pageSize="@size">@size</a>
+    }
+</p>

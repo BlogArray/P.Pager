@@ -1,0 +1,25 @@
+@model IEnumerable<Member>
+
+<table class="table table-striped table-sm">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>City</th>
+            <th>Joined</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Member member in Model)
+        {
+            <tr>
+                <td>@member.Id</td>
+                <td>@member.Name</td>
+                <td>@member.Email</td>
+                <td>@member.City</td>
+                <td>@member.Joined.ToString("d")</td>
+            </tr>
+        }
+    </tbody>
+</table>

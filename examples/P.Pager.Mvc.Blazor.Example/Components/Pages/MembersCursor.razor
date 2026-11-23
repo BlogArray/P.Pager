@@ -1,0 +1,100 @@
+@page "/members-cursor"
+@rendermode InteractiveServer
+@inject MemberStore Store
+
+<PageTitle>Cursor (keyset)</PageTitle>
+
+<h1>Cursor (keyset)</h1>
+
+<p>
+    <code>ToKeysetPage</code> seeks to the rows after a key (<code>WHERE Id &gt; @@after ORDER BY Id</code>) instead of
+    skipping rows, so page 1,000 is as fast as page 1, and rows added or deleted meanwhile don't shift the pages.
+    There is no count and no page numbers, only the key of the last row (<code>NextKey</code>).
+</p>
+
+<h2 class="h4 mt-4">Previous / next</h2>
+<p>The component keeps the cursors it has visited, so Previous goes back without another kind of query.</p>
+
+<MemberTable Items="page.Items" />
+
+<nav class="pager" aria-label="Pagination">
+    <ul class="pager-list">
+        <li class="pager-item @(cursors.Count == 0 ? "is-disabled" : null)">
+            <button type="button" class="pager-link" disabled="@(cursors.Count == 0)" @onclick="First">First</button>
+        </li>
+        <li class="pager-item @(cursors.Count == 0 ? "is-disabled" : null)">
+            <button type="button" class="pager-link" disabled="@(cursors.Count == 0)" @onclick="Previous">‹ Previous</button>
+        </li>
+        <li class="pager-item @(!page.HasNextPage ? "is-disabled" : null)">
+            <button type="button" class="pager-link" disabled="@(!page.HasNextPage)" @onclick="Next">Next ›</button>
+        </li>
+    </ul>
+</nav>
+<p class="text-muted mt-2">Current cursor: <code>@(after?.ToString() ?? "none (first page)")</code>, next cursor: <code>@(page.HasNextPage ? page.NextKey.ToString() : "none (last page)")</code>.</p>
+
+<h2 class="h4 mt-5">Load more</h2>
+<p>The other common cursor UI: each click appends the next page, as in a feed or an infinite list.</p>
+
+<MemberTable Items="loaded" />
+
+@if (feedHasMore)
+{
+    <button type="button" class="btn btn-outline-primary" @onclick="LoadMore">Load more</button>
+}
+else
+{
+    <p class="text-muted">All @loaded.Count members loaded.</p>
+}
+
+@code {
+    private const int PageSize = 10;
+
+    // Previous / next: the cursors of the pages before this one, so Previous can return to them.
+    private readonly Stack<int?> cursors = new();
+    private int? after;
+    private KeysetPage<Member, int> page = null!;
+
+    // Load more: every member loaded so far, and the cursor to continue from.
+    private readonly List<Member> loaded = [];
+    private int feedCursor;
+    private bool feedHasMore;
+
+    protected override void OnInitialized()
+    {
+        Load(null);
+        LoadMore();
+    }
+
+    // With EF Core, use ToKeysetPageAsync(m => m.Id, after, size, (q, ct) => q.ToListAsync(ct)).
+    private void Load(int? cursor)
+    {
+        after = cursor;
+        page = cursor is int key
+            ? Store.Members.ToKeysetPage(m => m.Id, key, PageSize)
+            : Store.Members.ToKeysetPage(m => m.Id, PageSize);
+    }
+
+    private void Next()
+    {
+        cursors.Push(after);
+        Load(page.NextKey);
+    }
+
+    private void Previous() => Load(cursors.Pop());
+
+    private void First()
+    {
+        cursors.Clear();
+        Load(null);
+    }
+
+    private void LoadMore()
+    {
+        KeysetPage<Member, int> next = loaded.Count == 0
+            ? Store.Members.ToKeysetPage(m => m.Id, 25)
+            : Store.Members.ToKeysetPage(m => m.Id, feedCursor, 25);
+        loaded.AddRange(next.Items);
+        feedCursor = next.NextKey;
+        feedHasMore = next.HasNextPage;
+    }
+}

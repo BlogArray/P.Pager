@@ -1,0 +1,100 @@
+@model IPager<Member>
+
+@{
+    ViewData["Title"] = "All options";
+}
+
+<h1>All options</h1>
+<p>Every layout preset, theme and text option of the HTML helper and Tag Helper, on the same data (5 per page).</p>
+
+<partial name="_MemberTable" model="Model" />
+
+<h3>Pager Configurations</h3>
+<h6>Default Pager Control <small>(PagerTheme.Neutral, styled by _content/P.Pager.Mvc.Core/pager.css)</small></h6>
+@Html.Pager(Model, page => Url.Action("Gallery", new { page }))
+
+<h6>Tag Helper <small>(links keep the current query string, e.g. ?sort=name)</small></h6>
+<pager for="Model" />
+
+<h6>HTML helper without a URL function <small>(same as the Tag Helper)</small></h6>
+@Html.Pager(Model, PrePagerOptions.ClassicPager)
+
+<h3>Themes</h3>
+<h6>Classic <small>(new PagerOptions(PagerTheme.Classic): the 9.x markup)</small></h6>
+@Html.Pager(Model, new PagerOptions(PagerTheme.Classic))
+
+<h6>Bootstrap <small>(PrePagerOptions.Bootstrap, or PagerSettings.DefaultTheme = PagerTheme.Bootstrap for every pager)</small></h6>
+@Html.Pager(Model, PrePagerOptions.Bootstrap)
+
+<h6>Bootstrap, centered and small <small>(adjust a copy of a theme)</small></h6>
+@{
+    PagerTheme bootstrapSmall = PagerTheme.Bootstrap.Clone();
+    bootstrapSmall.List = "pagination pagination-sm justify-content-center";
+}
+@Html.Pager(Model, new PagerOptions().ApplyTheme(bootstrapSmall))
+
+<h6>Layout preset + theme <small>(PrePagerOptions.ClassicPagerWithFirstAndLastPages.ApplyTheme(PagerTheme.Bootstrap))</small></h6>
+@Html.Pager(Model, PrePagerOptions.ClassicPagerWithFirstAndLastPages.ApplyTheme(PagerTheme.Bootstrap))
+
+<h3>Layout presets</h3>
+<h6>Minimal Pager</h6>
+@Html.Pager(Model, page => Url.Action("Gallery", new { page }), PrePagerOptions.Minimal)
+
+<h6>Minimal Pager with Pager Text (Page Count Text)</h6>
+@Html.Pager(Model, page => Url.Action("Gallery", new { page }), PrePagerOptions.MinimalWithPagerText)
+
+<h6>Minimal Pager with entries text (Item Count Text)</h6>
+@Html.Pager(Model, page => Url.Action("Gallery", new { page }), PrePagerOptions.MinimalWithEntriesText)
+
+<h6>Classic Pager <small>(always shows Previous/Next links, but sometimes they are disabled)</small></h6>
+@Html.Pager(Model, page => Url.Action("Gallery", new { page }), PrePagerOptions.ClassicPager)
+
+<h6>Classic Pager <small>(Classic Pager with First and Last links, but sometimes they are disabled)</small></h6>
+@Html.Pager(Model, page => Url.Action("Gallery", new { page }), PrePagerOptions.ClassicPagerWithFirstAndLastPages)
+
+<h6>Shows custom page numbers, let say 10 pages.</h6>
+@Html.Pager(Model, page => Url.Action("Gallery", new { page }), new PagerOptions
+{
+    PagesToDisplay = 10
+})
+
+<h6>With Custom Page numbers</h6>
+@Html.Pager(Model, page => Url.Action("Gallery", new { page }), new PagerOptions
+{
+    TextToIndividualPages = "Page-{0}"
+})
+
+<h6>Custom Wording. (<i>Can use for translation also.</i>)</h6>
+@Html.Pager(Model, page => Url.Action("Gallery", new { page }), new PagerOptions
+{
+    TextToPreviousPage = "Previous Page",
+    TextToNextPage = "Next Page",
+    TextToFirstPage = "First Page",
+    TextToLastPage = "Last Page"
+})
+
+<h6>Custom options.</h6>
+@Html.Pager(Model, page => Url.Action("Gallery", new { page }), new PagerOptions
+{
+    TextToPreviousPage = "previous",
+    TextToNextPage = "next",
+    TextToFirstPage = "first",
+    TextToLastPage = "last",
+    ClassToPagerContainer = null,
+    ClassToUl = "list-inline",
+    ClassToLi = "list-inline-item",
+    PageClass = null,
+    ClassToActiveLi = "fw-bold",
+    TextForDelimiter = " | "
+})
+
+<h6>
+    Custom Icon Options (Bootstrap Icons, Bootstrap theme)
+</h6>
+@Html.Pager(Model, page => Url.Action("Gallery", new { page }), new PagerOptions(PagerTheme.Bootstrap)
+{
+    TextToPreviousPage = "<i class='bi bi-skip-start'></i>",
+    TextToNextPage = "<i class='bi bi-skip-end'></i>",
+    TextToFirstPage = "<i class='bi bi-skip-backward'></i>",
+    TextToLastPage = "<i class='bi bi-skip-forward'></i>"
+})

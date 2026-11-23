@@ -1,0 +1,18 @@
+@model ISlice<Member>
+@{
+    ViewData["Title"] = "Slice (no count)";
+}
+
+<h1>Slice (no count)</h1>
+
+<p>
+    <code>ToSlice</code> reads one extra row instead of running a <code>COUNT</code> query, so it only knows whether a
+    next page exists. Use it for large tables where counting is expensive. The pager shows first, previous and next
+    (there is no last page or page numbers without a count).
+</p>
+
+<p class="text-muted">Members @Model.StartItemIndex–@Model.EndItemIndex, newest first (page @Model.CurrentPageIndex).</p>
+
+<partial name="_MemberTable" model="Model" />
+
+<pager slice="Model" options="@(new PagerOptions { TextToPreviousPage = "‹ Newer", TextToNextPage = "Older ›" })" />

@@ -1,7 +1,14 @@
+using P.Pager.Mvc.Core10.Example.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddSingleton<MemberStore>();
+
+// Pagers use the neutral theme (styled by _content/P.Pager.Mvc.Core/pager.css) unless their options say otherwise.
+// To use Bootstrap classes everywhere instead:
+// P.Pager.PagerSettings.DefaultTheme = P.Pager.PagerTheme.Bootstrap;
 
 var app = builder.Build();
 

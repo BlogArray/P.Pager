@@ -29,3 +29,10 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+/* pager.css is customised with CSS variables: a pill-shaped purple pager for the "Custom text and classes" demo. */
+.demo-rounded {
+  --pager-radius: 999px;
+  --pager-active-bg: #7c3aed;
+  --pager-active-border: #7c3aed;
+}

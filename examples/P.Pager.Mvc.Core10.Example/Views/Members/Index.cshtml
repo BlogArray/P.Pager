@@ -1,0 +1,130 @@
+@model MembersViewModel
+@{
+    ViewData["Title"] = "Pager";
+    IPager<Member> members = Model.Members;
+
+    PagerTheme theme = Model.Theme switch
+    {
+        "Bootstrap" => PagerTheme.Bootstrap,
+        "Classic" => PagerTheme.Classic,
+        _ => PagerTheme.Neutral,
+    };
+    PagerOptions options = new(theme)
+    {
+        PagesToDisplay = Model.PagesToDisplay,
+        HasIndividualPages = Model.Numbers,
+        DisplayFirstPage = Model.FirstLast ? PagerDisplayMode.IfNeeded : PagerDisplayMode.Never,
+        DisplayLastPage = Model.FirstLast ? PagerDisplayMode.IfNeeded : PagerDisplayMode.Never,
+    };
+
+    // Clicking a column sorts by it; clicking it again reverses the order. The other options are kept.
+    string SortUrl(string field)
+    {
+        string sort = Model.Sort == field ? "-" + field : field;
+        return Url.Action("Index", new
+        {
+            sort,
+            pageSize = members.PageSize,
+            theme = Model.Theme,
+            pagesToDisplay = Model.PagesToDisplay,
+            firstLast = Model.FirstLast,
+            numbers = Model.Numbers,
+        })!;
+    }
+
+    string Arrow(string field) => Model.Sort == field ? " ▲" : Model.Sort == "-" + field ? " ▼" : "";
+}
+
+<h1>Pager</h1>
+
+<p>
+    Offset paging with a total count. Everything comes from the query string, so every page can be bookmarked and shared:
+    <code>PageRequest</code> binds <code>?page=&amp;pageSize=&amp;sort=</code>, a <code>SortMap</code> allow-lists the sortable
+    columns and the page size is capped at 50. Out-of-range pages are clamped, so <a href="?page=999">?page=999</a> shows the last page.
+</p>
+
+<form method="get" class="row g-3 align-items-end mb-3">
+    <input type="hidden" name="sort" value="@Model.Sort" />
+    <div class="col-auto">
+        <label class="form-label" for="theme">Theme</label>
+        <select id="theme" name="theme" class="form-select">
+            <option value="Neutral" selected="@(Model.Theme == "Neutral")">Neutral (default, pager.css)</option>
+            <option value="Bootstrap" selected="@(Model.Theme == "Bootstrap")">Bootstrap</option>
+            <option value="Classic" selected="@(Model.Theme == "Classic")">Classic (9.x markup)</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <label class="form-label" for="pageSize">Page size</label>
+        <select id="pageSize" name="pageSize" class="form-select">
+            @foreach (int size in new[] { 5, 10, 25, 50 })
+            {
+                <option value="@size" selected="@(members.PageSize == size)">@size</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <label class="form-label" for="pagesToDisplay">Page numbers shown</label>
+        <input id="pagesToDisplay" name="pagesToDisplay" class="form-control" type="number" min="1" max="15" value="@Model.PagesToDisplay" />
+    </div>
+    <div class="col-auto">
+        @* An unchecked checkbox sends nothing, so a hidden "false" follows it; MVC binds the first value. *@
+        <div class="form-check">
+            <input id="firstLast" name="firstLast" class="form-check-input" type="checkbox" value="true" checked="@Model.FirstLast" />
+            <input type="hidden" name="firstLast" value="false" />
+            <label class="form-check-label" for="firstLast">First / last</label>
+        </div>
+        <div class="form-check">
+            <input id="numbers" name="numbers" class="form-check-input" type="checkbox" value="true" checked="@Model.Numbers" />
+            <input type="hidden" name="numbers" value="false" />
+            <label class="form-check-label" for="numbers">Page numbers</label>
+        </div>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Apply</button>
+    </div>
+</form>
+
+<p class="text-muted">
+    Showing @members.StartItemIndex–@members.EndItemIndex of @members.TotalItemCount members
+    (page @members.CurrentPageIndex of @members.TotalPageCount).
+</p>
+
+<table class="table table-striped table-sm">
+    <thead>
+        <tr>
+            <th><a href="@SortUrl("id")">#@Arrow("id")</a></th>
+            <th><a href="@SortUrl("name")">Name@Arrow("name")</a></th>
+            <th>Email</th>
+            <th><a href="@SortUrl("city")">City@Arrow("city")</a></th>
+            <th><a href="@SortUrl("joined")">Joined@Arrow("joined")</a></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Member member in members)
+        {
+            <tr>
+                <td>@member.Id</td>
+                <td>@member.Name</td>
+                <td>@member.Email</td>
+                <td>@member.City</td>
+                <td>@member.Joined.ToString("d")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@* Without page-url the links are the current URL with only ?page= changed, so sort, size and options are kept. *@
+<pager for="members" options="options" />
+
+<h2 class="h4 mt-5">Custom text and classes</h2>
+<p>Text and single CSS classes can be overridden on top of any theme.</p>
+
+<pager for="members" options="@(new PagerOptions
+{
+    TextToFirstPage = "First",
+    TextToPreviousPage = "Previous",
+    TextToNextPage = "Next",
+    TextToLastPage = "Last",
+    PagesToDisplay = 3,
+    ClassToPagerContainer = "pager demo-rounded",
+})" />
