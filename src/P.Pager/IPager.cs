@@ -10,20 +10,17 @@ namespace P.Pager
         /// <summary>
         /// Index of child set within the parent list.
         /// </summary>
-        /// <remarks>Deprecated setter: changing paging metadata after construction makes it inconsistent with the items. It will be removed in v10.</remarks>
-        int CurrentPageIndex { get; set; }
+        int CurrentPageIndex { get; }
 
         /// <summary>
         /// Size of individual child set.
         /// </summary>
-        /// <remarks>Deprecated setter: changing paging metadata after construction makes it inconsistent with the items. It will be removed in v10.</remarks>
-        int PageSize { get; set; }
+        int PageSize { get; }
 
         /// <summary>
         /// Total number of items in parent list.
         /// </summary>
-        /// <remarks>Deprecated setter: changing paging metadata after construction makes it inconsistent with the items. It will be removed in v10.</remarks>
-        int TotalItemCount { get; set; }
+        int TotalItemCount { get; }
 
         /// <summary>
         /// Total number of child sets in parent list.

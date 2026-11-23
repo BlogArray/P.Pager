@@ -13,16 +13,6 @@ namespace P.Pager
     /// </summary>
     public static class PagerExtension
     {
-        /// <summary>
-        /// Page-size check for the methods that existed in 9.0: negative sizes throw (as in 9.0), and 0 returns an empty page
-        /// instead of throwing, so apps that pass 0 keep working. New methods use <see cref="ValidatePageSize"/> (must be at least 1).
-        /// </summary>
-        private static void ValidateLegacyPageSize(int pageSize)
-        {
-            if (pageSize < 0)
-                throw new ArgumentOutOfRangeException(nameof(pageSize), pageSize, "pageSize cannot be negative.");
-        }
-
         internal static void ValidatePageSize(int pageSize)
         {
             if (pageSize < 1)
@@ -73,11 +63,9 @@ namespace P.Pager
         private static IPager<T> PageInMemory<T>(IEnumerable<T> allItems, int pageIndex, int pageSize)
         {
             if (allItems == null) throw new ArgumentNullException(nameof(allItems));
-            ValidateLegacyPageSize(pageSize);
+            ValidatePageSize(pageSize);
 
             IReadOnlyCollection<T> items = allItems as IReadOnlyCollection<T> ?? allItems.ToList();
-            if (pageSize == 0)
-                return new PagerAsync<T>([], Math.Max(1, pageIndex), 0, items.Count);
             pageIndex = ClampPageIndex(pageIndex, pageSize, items.Count);
             int itemIndex = (pageIndex - 1) * pageSize;
             return new PagerAsync<T>(items.Skip(itemIndex).Take(pageSize), pageIndex, pageSize, items.Count);
@@ -126,11 +114,9 @@ namespace P.Pager
         /// <returns>Child set that is divided from parent list.</returns>
         public static IPager<T> AsPagerList<T>(this IQueryable<T> allItems, int pageIndex, int pageSize)
         {
-            ValidateLegacyPageSize(pageSize);
+            ValidatePageSize(pageSize);
             CheckOrdering(allItems);
             int totalItemCount = allItems.Count();
-            if (pageSize == 0)
-                return new PagerAsync<T>([], Math.Max(1, pageIndex), 0, totalItemCount);
             pageIndex = ClampPageIndex(pageIndex, pageSize, totalItemCount);
             int itemIndex = (pageIndex - 1) * pageSize;
             IQueryable<T> pageOfItems = allItems.Skip(itemIndex).Take(pageSize);
@@ -148,33 +134,15 @@ namespace P.Pager
         /// <returns>Child set that is divided from parent list.</returns>
         private static async Task<IPager<T>> AsPagerListAsync<T>(IQueryable<T> allItems, int pageIndex, int pageSize, CancellationToken cancellationToken)
         {
-            ValidateLegacyPageSize(pageSize);
+            ValidatePageSize(pageSize);
             CheckOrdering(allItems);
             List<T> childSet = [];
             int totalItemCount = allItems.Count();
-            if (pageSize == 0)
-                return new PagerAsync<T>(childSet, Math.Max(1, pageIndex), 0, totalItemCount);
             pageIndex = ClampPageIndex(pageIndex, pageSize, totalItemCount);
             int itemIndex = (pageIndex - 1) * pageSize;
             IQueryable<T> pageQuery = allItems.Skip(itemIndex).Take(pageSize);
             childSet.AddRange(await Task.Run(() => pageQuery.ToList(), cancellationToken).ConfigureAwait(false));
             return new PagerAsync<T>(childSet, pageIndex, pageSize, totalItemCount);
-        }
-
-        /// <summary>
-        /// Async creates a child set of this collection of objects that can be individually accessed by index and containing metadata about the collection of objects.
-        /// </summary>
-        /// <typeparam name="T">The type of object the collection should contain.</typeparam>
-        /// <param name="allItems">Parent that is divided in to children.</param>
-        /// <param name="cancellationToken">Propagates notification that operations should be canceled.</param>
-        /// <returns>Child set that is divided from parent list.</returns>
-        /// <remarks>
-        /// Deprecated: this only wraps <c>ToList()</c> in <c>Task.Run</c> and will be removed in v10. Use your provider's own
-        /// <c>ToListAsync</c> (for example Entity Framework Core's), or the <c>ToPagerListAsync</c> overload that takes countAsync/toListAsync.
-        /// </remarks>
-        public static async Task<List<T>> ToListAsync<T>(this IEnumerable<T> allItems, CancellationToken cancellationToken)
-        {
-            return await Task.Run(() => allItems.ToList(), cancellationToken);
         }
 
         /// <summary>

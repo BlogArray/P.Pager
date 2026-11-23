@@ -2,12 +2,11 @@
   <!-- Shared settings for every package under src/. Project files only hold what is specific to them. -->
 
   <PropertyGroup Label="Version">
-    <!-- Bump here to version all packages together. 9.0.0 is published on nuget.org, so this release is a
-         backward-compatible minor version: public API and default output must stay compatible with 9.0.0. -->
-    <Version>9.1.0</Version>
-    <!-- AssemblyVersion stays 9.0.0.0 within 9.x so strong-named apps and binding redirects keep working. -->
-    <AssemblyVersion>9.0.0.0</AssemblyVersion>
-    <FileVersion>9.1.0.0</FileVersion>
+    <!-- Bump here to version all packages together. 10.0.0 is a major version: its intentional breaking changes
+         against the published baseline are listed in each project's CompatibilitySuppressions.xml. -->
+    <Version>10.0.0</Version>
+    <AssemblyVersion>10.0.0.0</AssemblyVersion>
+    <FileVersion>10.0.0.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Package metadata">
@@ -40,7 +39,8 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <EnablePackageValidation>true</EnablePackageValidation>
-    <!-- Fail the build on any API break versus the published package (P.Pager.Blazor is new, so it has no baseline). -->
+    <!-- Fail the build on any API break versus the published package that is not listed in CompatibilitySuppressions.xml
+         (P.Pager.Blazor has no published version yet, so it has no baseline). Move to 9.1.0 once 9.1.0 is on nuget.org. -->
     <PackageValidationBaselineVersion Condition="'$(MSBuildProjectName)' != 'P.Pager.Blazor'">9.0.0</PackageValidationBaselineVersion>
   </PropertyGroup>
 

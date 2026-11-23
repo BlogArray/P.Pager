@@ -43,10 +43,11 @@ namespace P.Pager
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("A sort name is required.", nameof(name));
             if (keySelector == null) throw new ArgumentNullException(nameof(keySelector));
+            name = name.Trim(); // validate the name as it is stored, so " -name" can't slip through
             if (name.StartsWith("-", StringComparison.Ordinal) || name.StartsWith("+", StringComparison.Ordinal) || name.Contains(","))
                 throw new ArgumentException("Sort names can't start with + or - or contain commas.", nameof(name));
 
-            _fields[name.Trim()] = (query, first, descending) =>
+            _fields[name] = (query, first, descending) =>
                 first
                     ? (descending ? query.OrderByDescending(keySelector) : query.OrderBy(keySelector))
                     : (descending ? ((IOrderedQueryable<T>)query).ThenByDescending(keySelector) : ((IOrderedQueryable<T>)query).ThenBy(keySelector));

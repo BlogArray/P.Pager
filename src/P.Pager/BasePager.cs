@@ -35,9 +35,9 @@ namespace P.Pager
                 throw new ArgumentOutOfRangeException(nameof(pageIndex), pageIndex, "pageIndex cannot be less than 1.");
             }
 
-            if (pageSize < 0) // 0 is allowed, as in 9.0 (an empty page)
+            if (pageSize < 1)
             {
-                throw new ArgumentOutOfRangeException(nameof(pageSize), pageSize, "pageSize cannot be negative.");
+                throw new ArgumentOutOfRangeException(nameof(pageSize), pageSize, "pageSize cannot be less than 1.");
             }
 
             TotalItemCount = totalItemCount;
@@ -48,20 +48,17 @@ namespace P.Pager
         /// <summary>
         /// Index of child set within the parent list.
         /// </summary>
-        /// <remarks>Deprecated setter: changing paging metadata after construction makes it inconsistent with the items. It will be removed in v10.</remarks>
-        public int CurrentPageIndex { get; set; }
+        public int CurrentPageIndex { get; protected set; }
 
         /// <summary>
         /// Size of individual child set.
         /// </summary>
-        /// <remarks>Deprecated setter: changing paging metadata after construction makes it inconsistent with the items. It will be removed in v10.</remarks>
-        public int PageSize { get; set; }
+        public int PageSize { get; protected set; }
 
         /// <summary>
         /// Total number of items in parent list.
         /// </summary>
-        /// <remarks>Deprecated setter: changing paging metadata after construction makes it inconsistent with the items. It will be removed in v10.</remarks>
-        public int TotalItemCount { get; set; }
+        public int TotalItemCount { get; protected set; }
 
         /// <summary>
         /// Total number of child sets in parent list.

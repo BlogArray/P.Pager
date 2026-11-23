@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <!-- Shared settings (version, metadata, SourceLink, AOT, ...) are in ..\Directory.Build.props -->
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net9.0;net10.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net9.0;net10.0;net11.0</TargetFrameworks>
     <Title>P.Pager</Title>
     <Description>Lightweight package for easily paging through any IEnumerable/IQueryable in .NET and .NET Core.</Description>
     <PackageTags>Paged list, paging in .net core, asp.net pagedlist, paging in .net, paging in mvc, MvcPager, MvcPagedList, PaginationInMvc, MvcPagination</PackageTags>
-    <PackageReleaseNotes>v9.1 - Backward compatible with 9.0. Targets .NET Standard 2.0/2.1, .NET 8, .NET 9 and .NET 10. See docs/version-history.md.</PackageReleaseNotes>
+    <PackageReleaseNotes>v10.0 - Major version: read-only IPager paging values, pageSize must be at least 1, ToListAsync(IEnumerable) removed. See docs/version-history.md for the upgrade guide.</PackageReleaseNotes>
     <AssemblyOriginatorKeyFile>p.pager.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 </Project>
